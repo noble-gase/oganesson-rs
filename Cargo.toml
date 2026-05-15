@@ -1,10 +1,10 @@
 [package]
 name = "rnx"
-version = "0.7.0"
+version = "0.8.0"
 edition = "2024"
 authors = ["ShengHui <847713844@qq.com>"]
 description = "The Rust web development scaffold, support salvo and axum"
-keywords = ["http", "web", "api", "salvo", "axum"]
+keywords = ["web", "api", "actix-web", "salvo", "axum"]
 documentation = "https://docs.rs/rnx"
 license = "MIT"
 repository = "https://github.com/noble-gase/rn"

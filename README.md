@@ -3,7 +3,7 @@
 [<img alt="crates.io" src="https://img.shields.io/crates/v/rnx.svg?style=for-the-badge&color=fc8d62&logo=rust" height="20">](https://crates.io/crates/rnx)
 [<img alt="MIT" src="http://img.shields.io/badge/license-MIT-brightgreen.svg?style=for-the-badge" height="20">](http://opensource.org/licenses/MIT)
 
-[氡-Rn] Rust Web开发脚手架，支持 `salvo` 和 `axum` 框架，并支持「单应用」和「多应用」模式
+[氡-Rn] Rust Web开发脚手架，支持 `actix-web`、 `axum` 和 `salvo` 框架，并支持「单应用」和「多应用」模式
 
 ## 安装
 
@@ -29,13 +29,17 @@ cargo install rnx
 ### 单应用
 
 ```shell
-# salvo
+# actix-web
 rnx new # 在当前目录初始化项目
 rnx new --name demo # 创建demo项目
 
 # axum
 rnx new --axum # 在当前目录初始化项目
 rnx new --name demo --axum # 创建demo项目
+
+# salvo
+rnx new --salvo # 在当前目录初始化项目
+rnx new --name demo --salvo # 创建demo项目
 
 .
 ├── Cargo.toml
@@ -70,13 +74,17 @@ rnx new --name demo --axum # 创建demo项目
 ### 多应用
 
 ```shell
-# salvo
+# actix-web
 rnx new --app foo --app bar # 在当前目录初始化项目
 rnx new --name demo --app foo --app bar # 创建demo项目
 
 # axum
 rnx new --app foo --app bar --axum # 在当前目录初始化项目
 rnx new --name demo --app foo --app bar --axum # 创建demo项目
+
+# salvo
+rnx new --app foo --app bar --salvo # 在当前目录初始化项目
+rnx new --name demo --app foo --app bar --salvo # 创建demo项目
 
 .
 ├── Cargo.toml
@@ -120,11 +128,14 @@ rnx new --name demo --app foo --app bar --axum # 创建demo项目
 > 多应用项目适用，需在项目根目录执行（即：`Cargo.toml` 所在目录）
 
 ```shell
-# salvo
+# actix-web
 rnx app --name foo --name bar
 
 # axum
 rnx app --name foo --name bar --axum
+
+# salvo
+rnx app --name foo --name --salvo bar
 
 .
 ├── Cargo.toml

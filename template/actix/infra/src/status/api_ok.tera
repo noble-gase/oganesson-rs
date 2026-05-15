@@ -1,0 +1,24 @@
+use actix_web::{HttpRequest, HttpResponse, Responder, body::BoxBody};
+use serde::Serialize;
+
+use crate::status::ApiBody;
+
+pub struct ApiOK<T>(pub Option<T>)
+where
+    T: Serialize + Send;
+
+impl<T> Responder for ApiOK<T>
+where
+    T: Serialize + Send,
+{
+    type Body = BoxBody;
+
+    fn respond_to(self, _req: &HttpRequest) -> HttpResponse<Self::Body> {
+        let body = ApiBody {
+            code: 0,
+            msg: "success".to_string(),
+            data: self.0,
+        };
+        HttpResponse::Ok().json(body)
+    }
+}

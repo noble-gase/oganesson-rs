@@ -1,0 +1,24 @@
+use sea_query::*;
+
+// For example Demo table with column id, name...
+#[derive(Iden)]
+pub enum Demo {
+    Table,
+    Id,
+    Name,
+    CreatedAt,
+    UpdatedAt,
+}
+
+// Mapping between Enum variant and its corresponding string value
+// impl Iden for Demo {
+//     fn unquoted(&self) -> &str {
+//         match self {
+//             Self::Table => "demo",
+//             Self::Id => "id",
+//             Self::Name => "name",
+//             Self::CreatedAt => "created_at",
+//             Self::UpdatedAt => "updated_at",
+//         }
+//     }
+// }

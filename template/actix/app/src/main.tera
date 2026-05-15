@@ -1,0 +1,43 @@
+pub mod cmd;
+pub mod handler;
+pub mod middleware;
+pub mod router;
+pub mod service;
+
+use std::{panic, sync::Arc};
+
+use clap::Parser;
+use figlet_rs::FIGlet;
+use infra::core::{AppState, config, logger};
+
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    let std_font = FIGlet::standard().unwrap();
+    println!("{}", std_font.convert("{{ app_name }}").unwrap());
+
+    let cli = cmd::Cli::parse();
+
+    // init config
+    config::init(&cli.config)?;
+
+    // _guard 必须在 main 函数中才能使日志生效
+    let _guard = logger::init();
+
+    // catch panic
+    panic::set_hook(Box::new(|e| {
+        tracing::error!(panic = %e);
+    }));
+
+    let state = Arc::new(AppState::default());
+    // let state = Arc::new(AppState::new().await?);
+
+    match cli.command {
+        Some(cmd::Command::Hello { name }) => cmd::hello::run(name),
+        Some(cmd::Command::Serve) => cmd::serve::run(state.clone()).await,
+        _ => {
+            println!("🦀 Welcome to use noble-gase[Actix-Web] scaffold");
+        }
+    }
+
+    Ok(())
+}

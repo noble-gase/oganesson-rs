@@ -1,0 +1,22 @@
+[package]
+name = "repo"
+description = "repo crate"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lib]
+name = "repo"
+path = "src/lib.rs"
+
+[dependencies]
+infra = { workspace = true }
+anyhow = { workspace = true }
+serde = { workspace = true }
+sqlx = { workspace = true }
+redis = { workspace = true }
+jiff = { workspace = true }
+time = { workspace = true }
+sea-query = { workspace = true }
+kr = { workspace = true }

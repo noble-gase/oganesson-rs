@@ -6,7 +6,7 @@ use validator::Validate;
 
 use infra::{
     core::AppState,
-    status::{api_ok::ApiOK, ApiResult},
+    status::{ApiResult, api_ok::ApiOK},
 };
 
 #[derive(Debug, Validate, Deserialize, Serialize)]
@@ -20,8 +20,7 @@ pub struct RespHello {
     pub message: String,
 }
 
-pub async fn hello(ctx: &AppState, req: ReqHello) -> ApiResult<RespHello> {
-    let _ = ctx;
+pub async fn hello(_ctx: &AppState, req: ReqHello) -> ApiResult<RespHello> {
     // let ret = demo::get_by_id::<model::Demo>(ctx, 1, None)
     //     .await
     //     .with_context(|| make_ctx("demo::get_by_id failed"))?;

@@ -5,7 +5,14 @@ use std::sync::Arc;
 use prometheus::{Encoder, TextEncoder};
 use salvo::{affix_state, cors::Cors, handler, Router};
 
-use infra::{self, core::AppState};
+use infra::{
+    self,
+    core::AppState,
+    middleware::{
+        log, metric, panic,
+        trace::{self, TRACE_ID},
+    },
+};
 
 pub fn init(state: Arc<AppState>) -> Router {
     Router::new()
@@ -38,15 +45,15 @@ async fn metrics() -> String {
 
 pub fn router(state: Arc<AppState>) -> Router {
     let cors = Cors::permissive()
-        .expose_headers(vec![infra::middleware::trace::TRACE_ID])
+        .expose_headers(vec![TRACE_ID])
         .into_handler();
 
     Router::new()
         .hoop(affix_state::inject(state))
         .hoop(cors)
-        .hoop(infra::middleware::metrics::Metrics)
-        .hoop(infra::middleware::trace::Trace)
-        .hoop(infra::middleware::log::Log)
-        .hoop(infra::middleware::panic::Catch)
+        .hoop(metric::Metric)
+        .hoop(trace::Trace)
+        .hoop(log::Log)
+        .hoop(panic::Catch)
         .push(route::v1())
 }

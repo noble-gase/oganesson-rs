@@ -1,0 +1,19 @@
+pub mod api_err;
+pub mod api_ok;
+
+use serde::Serialize;
+
+use crate::status::{api_err::ApiErr, api_ok::ApiOK};
+
+#[derive(Serialize)]
+pub struct ApiBody<T>
+where
+    T: Serialize + Send,
+{
+    pub code: i32,
+    pub msg: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub data: Option<T>,
+}
+
+pub type ApiResult<T> = anyhow::Result<ApiOK<T>, ApiErr>;

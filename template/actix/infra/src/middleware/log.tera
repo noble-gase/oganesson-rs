@@ -1,0 +1,154 @@
+use std::collections::HashMap;
+use std::future::{Ready, ready};
+use std::rc::Rc;
+
+use actix_web::{
+    Error, HttpMessage,
+    body::{BoxBody, MessageBody},
+    dev::{Payload, Service, ServiceRequest, ServiceResponse, Transform, forward_ready},
+    http::header::HeaderMap,
+    web::{Bytes, BytesMut},
+};
+use futures::StreamExt;
+use futures::future::LocalBoxFuture;
+use jiff::Zoned;
+use kr::make_ctx;
+use serde_json::Value;
+
+use crate::status::api_err::ApiErr;
+
+const MAX_LOG_SIZE: usize = 32 << 10; // 32KB
+
+pub struct Log;
+
+impl<S, B> Transform<S, ServiceRequest> for Log
+where
+    S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error> + 'static,
+    S::Future: 'static,
+    B: MessageBody + 'static,
+{
+    type Response = ServiceResponse<BoxBody>;
+    type Error = Error;
+    type Transform = LogMiddleware<S>;
+    type InitError = ();
+    type Future = Ready<Result<Self::Transform, Self::InitError>>;
+
+    fn new_transform(&self, service: S) -> Self::Future {
+        ready(Ok(LogMiddleware { service: Rc::new(service) }))
+    }
+}
+
+pub struct LogMiddleware<S> {
+    service: Rc<S>,
+}
+
+impl<S, B> Service<ServiceRequest> for LogMiddleware<S>
+where
+    S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error> + 'static,
+    S::Future: 'static,
+    B: MessageBody + 'static,
+{
+    type Response = ServiceResponse<BoxBody>;
+    type Error = Error;
+    type Future = LocalBoxFuture<'static, Result<Self::Response, Self::Error>>;
+
+    forward_ready!(service);
+
+    fn call(&self, mut req: ServiceRequest) -> Self::Future {
+        let svc = self.service.clone();
+        Box::pin(async move {
+            let enter_time = Zoned::now();
+            let req_method = req.method().to_string();
+            let req_uri = req.uri().path_and_query().unwrap().to_string();
+            let req_header = header_to_string(req.headers());
+
+            // 获取请求体
+            let req_body = match drain_req_body(&mut req).await {
+                Err(e) => return Err(Error::from(e)),
+                Ok(v) => v,
+            };
+
+            let resp = svc.call(req).await?;
+
+            // 获取响应体
+            let (req_inner, http_resp) = resp.into_parts();
+            let (head, body) = http_resp.into_parts();
+            let body_bytes = match actix_web::body::to_bytes(body).await {
+                Ok(b) => b,
+                Err(e) => {
+                    let err: Box<dyn std::error::Error> = e.into();
+                    tracing::error!(err = ?err, "[response] body.to_bytes");
+                    Bytes::new()
+                }
+            };
+
+            let resp_body = std::str::from_utf8(&body_bytes[..body_bytes.len().min(MAX_LOG_SIZE)])
+                .map(|s| s.to_string())
+                .ok();
+            let status = head.status().as_u16();
+
+            // 请求时长
+            let duration = Zoned::now().duration_since(&enter_time).as_millis_f64();
+
+            // 日志记录
+            tracing::info!(
+                uri = req_uri,
+                method = req_method,
+                headers = req_header,
+                request = req_body,
+                response = resp_body,
+                status = status,
+                duration = duration,
+            );
+
+            let new_resp = head.set_body(BoxBody::new(body_bytes));
+            Ok(ServiceResponse::new(req_inner, new_resp))
+        })
+    }
+}
+
+fn header_to_string(h: &HeaderMap) -> String {
+    let mut map: HashMap<String, Vec<String>> = HashMap::new();
+    for k in h.keys() {
+        let mut vals: Vec<String> = Vec::new();
+        for v in h.get_all(k) {
+            if let Ok(s) = v.to_str() {
+                vals.push(s.to_string())
+            }
+        }
+        map.insert(k.to_string(), vals);
+    }
+    serde_json::to_string(&map).unwrap_or_else(|_| String::from("<none>"))
+}
+
+async fn drain_req_body(req: &mut ServiceRequest) -> Result<Option<String>, ApiErr> {
+    // 取出 Body
+    let mut payload = req.take_payload();
+    // this wont work if the body is a long running stream
+    let mut buf = BytesMut::new();
+    while let Some(chunk) = payload.next().await {
+        let chunk =
+            chunk.map_err(|e| ApiErr::System(anyhow::Error::msg(e.to_string()).context(make_ctx("request body collect failed"))))?;
+        buf.extend_from_slice(&chunk);
+    }
+    let bytes = buf.freeze();
+
+    // 处理 Body
+    let body_str = std::str::from_utf8(&bytes[..bytes.len().min(MAX_LOG_SIZE)])
+        .map(|s| {
+            // 解析JSON字符串
+            if let Ok(v) = serde_json::from_str::<Value>(s) {
+                // 将JSON数据格式化为紧凑的字符串
+                if let Ok(s) = serde_json::to_string(&v) {
+                    return s;
+                }
+            }
+            s.to_string()
+        })
+        .ok();
+
+    // 重置 Body
+    req.set_payload(Payload::from(bytes));
+
+    Ok(body_str)
+}

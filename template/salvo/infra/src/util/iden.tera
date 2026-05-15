@@ -89,7 +89,7 @@ impl Identity {
     }
 
     pub fn is_expired(&self) -> bool {
-        self.x > Zoned::now().timestamp().as_second()
+        self.x <= Zoned::now().timestamp().as_second()
     }
 
     pub fn is_role(&self, role: Role) -> bool {

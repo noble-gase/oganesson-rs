@@ -16,7 +16,7 @@ index = "sparse+https://rsproxy.cn/index/"
 EOF
 
 COPY . .
-RUN cargo build -p {{ app_name }} --release
+RUN cargo build -p {{ app_crate }} --release
 
 # runtime stage
 FROM debian:trixie-slim
@@ -26,9 +26,9 @@ WORKDIR /usr/local/bin
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
-COPY --from=builder /project/target/release/{{ app_name }} .
+COPY --from=builder /project/target/release/{{ app_crate }} .
 
 EXPOSE 8000
 
-ENTRYPOINT ["{{ app_name }}"]
+ENTRYPOINT ["{{ app_crate }}"]
 CMD ["--config", "/data/config.toml", "serve"]

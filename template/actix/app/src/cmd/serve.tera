@@ -1,0 +1,47 @@
+use std::sync::Arc;
+
+use actix_web::{App, HttpServer, dev::ServerHandle};
+use infra::core::{AppState, config::config};
+use tokio::signal::unix::{SignalKind, signal};
+
+use crate::router;
+
+pub async fn run(state: Arc<AppState>) {
+    let addr = config().get_string("app.addr").unwrap();
+
+    let server = HttpServer::new(move || App::new().configure(router::init(state.clone())))
+        .disable_signals()
+        .shutdown_timeout(30)
+        .bind(&addr)
+        .expect("bind failed")
+        .run();
+
+    let handle = server.handle();
+
+    // 创建一个任务来处理信号
+    tokio::spawn(shutdown_signal(handle));
+
+    if let Err(e) = server.await {
+        tracing::error!(err = ?e, "server stopped with error");
+    }
+}
+
+async fn shutdown_signal(handle: ServerHandle) {
+    let mut sigint = signal(SignalKind::interrupt()).unwrap();
+    let mut sigquit = signal(SignalKind::quit()).unwrap();
+    let mut sigterm = signal(SignalKind::terminate()).unwrap();
+
+    tokio::select! {
+        _ = sigint.recv() => {
+            println!("收到 SIGINT 信号，正在关闭服务...");
+        }
+        _ = sigquit.recv() => {
+            println!("收到 SIGQUIT 信号，正在关闭服务...");
+        }
+        _ = sigterm.recv() => {
+            println!("收到 SIGTERM 信号，正在关闭服务...");
+        }
+    }
+
+    handle.stop(true).await;
+}

@@ -1,8 +1,11 @@
 use std::{env, fs};
 
-use crate::core::{self, gen_members};
+use crate::{
+    cmd::Kind,
+    core::{self, gen_members},
+};
 
-pub fn run(apps: Vec<String>, axum: bool) {
+pub fn run(apps: Vec<String>, kind: Kind) {
     // 检查Cargo.toml是否存在
     if fs::metadata("Cargo.toml").is_err() {
         println!("👿 Cargo.toml does not exist, please confirm!");
@@ -14,14 +17,11 @@ pub fn run(apps: Vec<String>, axum: bool) {
     // 获取当前目录
     let dir = env::current_dir().unwrap().canonicalize().unwrap();
 
-    if axum {
-        core::build_axum_app(&dir, apps);
-    } else {
-        core::build_salvo_app(&dir, apps);
+    match kind {
+        Kind::Axum => core::build_axum_app(&dir, apps),
+        Kind::Salvo => core::build_salvo_app(&dir, apps),
+        _ => core::build_actix_app(&dir, apps),
     }
 
-    println!(
-        "🦀 The app is now created! Please add `{}` to workspace members",
-        members
-    );
+    println!("🦀 The app is now created! Please add `{members}` to workspace members");
 }

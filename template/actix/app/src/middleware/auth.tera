@@ -1,0 +1,24 @@
+use actix_web::{
+    Error, HttpMessage,
+    body::MessageBody,
+    dev::{ServiceRequest, ServiceResponse},
+    middleware::Next,
+};
+
+use infra::{status::api_err::ApiErr, util::iden::Identity};
+
+pub async fn auth_mw(req: ServiceRequest, next: Next<impl MessageBody>) -> Result<ServiceResponse<impl MessageBody>, Error> {
+    let unauthorized = {
+        match req.extensions().get::<Identity>() {
+            None => true,
+            Some(v) => v.id() == 0,
+        }
+    };
+    if unauthorized {
+        return Err(Error::from(ApiErr::Unauthorized));
+    }
+
+    // TODO: ...
+
+    next.call(req).await
+}

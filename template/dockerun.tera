@@ -1,13 +1,13 @@
 #!/bin/bash
 
-docker rm -f {{ app_name }}
-docker rmi -f {{ app_name }}
+docker rm -f {{ app_crate }}
+docker rmi -f {{ app_crate }}
 
-{% if app_name == "app" -%}
-docker build -t {{ app_name }} .
+{% if app_crate == "app" -%}
+docker build -t {{ app_crate }} .
 {% else -%}
-docker build -f Dockerfile.{{ app_name }} -t {{ app_name }} .
+docker build -f Dockerfile.{{ app_crate }} -t {{ app_crate }} .
 {% endif -%}
 docker image prune -f
 
-docker run -d --name={{ app_name }} --restart=always --privileged -p 10086:8000 -v /data/{{ app_name }}:/data {{ app_name }}
+docker run -d --name={{ app_crate }} --restart=always --privileged -p 10086:8000 -v /data/{{ app_crate }}:/data {{ app_crate }}

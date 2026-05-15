@@ -10,8 +10,8 @@ use axum::{
 
 use crate::status::api_err::ApiErr;
 
-pub async fn handle(request: Request, next: Next) -> Response {
-    let ret = AssertUnwindSafe(next.run(request)).catch_unwind().await;
+pub async fn catch_mw(req: Request, next: Next) -> Response {
+    let ret = AssertUnwindSafe(next.run(req)).catch_unwind().await;
     if let Ok(resp) = ret {
         return resp;
     }

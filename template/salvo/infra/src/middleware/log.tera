@@ -27,13 +27,7 @@ impl Log {
 
 #[async_trait]
 impl Handler for Log {
-    async fn handle(
-        &self,
-        req: &mut Request,
-        depot: &mut Depot,
-        resp: &mut Response,
-        ctrl: &mut FlowCtrl,
-    ) {
+    async fn handle(&self, req: &mut Request, depot: &mut Depot, resp: &mut Response, ctrl: &mut FlowCtrl) {
         let enter_time = Zoned::now();
         let req_method = req.method().to_string();
         let req_uri = req.uri().path_and_query().unwrap().to_string();

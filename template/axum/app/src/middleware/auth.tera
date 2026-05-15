@@ -6,16 +6,18 @@ use axum::{
 
 use infra::{status::api_err::ApiErr, util::iden::Identity};
 
-pub async fn handle(request: Request, next: Next) -> Response {
-    let identity = request.extensions().get::<Identity>();
-    match identity {
-        None => return ApiErr::Unauthorized.into_response(),
-        Some(iden) => {
-            if iden.id() == 0 {
-                return ApiErr::Unauthorized.into_response();
-            }
-            // TODO: ...
+pub async fn auth_mw(req: Request, next: Next) -> Response {
+    let unauthorized = {
+        match req.extensions().get::<Identity>() {
+            None => true,
+            Some(v) => v.id() == 0,
         }
+    };
+    if unauthorized {
+        return ApiErr::Unauthorized.into_response();
     }
-    next.run(request).await
+
+    // TODO: ...
+
+    next.run(req).await
 }

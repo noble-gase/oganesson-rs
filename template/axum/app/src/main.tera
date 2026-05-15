@@ -7,10 +7,14 @@ pub mod service;
 use std::{panic, sync::Arc};
 
 use clap::Parser;
-use infra::core::{config, logger, AppState};
+use figlet_rs::FIGlet;
+use infra::core::{AppState, config, logger};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    let std_font = FIGlet::standard().unwrap();
+    println!("{}", std_font.convert("{{ app_name }}").unwrap());
+
     let cli = cmd::Cli::parse();
 
     // init config
@@ -37,4 +41,3 @@ async fn main() -> anyhow::Result<()> {
 
     Ok(())
 }
-

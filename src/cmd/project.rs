@@ -1,8 +1,11 @@
 use std::{env, fs};
 
-use crate::core::{self, is_empty_dir};
+use crate::{
+    cmd::Kind,
+    core::{self, is_empty_dir},
+};
 
-pub fn run(name: Option<String>, axum: bool, apps: Vec<String>) {
+pub fn run(name: Option<String>, kind: Kind, apps: Vec<String>) {
     // 获取当前目录
     let cur_dir = env::current_dir().unwrap().canonicalize().unwrap();
 
@@ -30,10 +33,10 @@ pub fn run(name: Option<String>, axum: bool, apps: Vec<String>) {
     };
 
     // 创建项目
-    if axum {
-        core::build_axum_project(&root, name, apps);
-    } else {
-        core::build_salvo_project(&root, name, apps);
+    match kind {
+        Kind::Axum => core::build_axum_project(&root, name, apps),
+        Kind::Salvo => core::build_salvo_project(&root, name, apps),
+        _ => core::build_actix_project(&root, name, apps),
     }
 
     println!("🦀 Project creation completed! please read README")

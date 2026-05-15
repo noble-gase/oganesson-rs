@@ -17,7 +17,7 @@ use crate::status::api_err::ApiErr;
 
 const MAX_LOG_SIZE: usize = 32 << 10; // 32KB
 
-pub async fn handle(request: Request, next: Next) -> Response {
+pub async fn log_mw(request: Request, next: Next) -> Response {
     let enter_time = Zoned::now();
     let req_method = request.method().to_string();
     let req_uri = request.uri().to_string();
@@ -58,10 +58,7 @@ fn header_to_string(h: &HeaderMap) -> String {
     serde_json::to_string(&map).unwrap_or_else(|_| String::from("<none>"))
 }
 
-async fn drain_body(
-    request: Request,
-    next: Next,
-) -> Result<(Response, (Option<String>, Option<String>)), ApiErr> {
+async fn drain_body(request: Request, next: Next) -> Result<(Response, (Option<String>, Option<String>)), ApiErr> {
     // Request
     // 取出 Body
     let (req_parts, req_body) = request.into_parts();

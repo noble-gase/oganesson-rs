@@ -1,11 +1,12 @@
-use axum::{extract::State, Json};
+use axum::extract::State;
 use std::sync::Arc;
 
 use validator::Validate;
 
 use infra::{
     core::AppState,
-    status::{api_err::ApiErr, ApiResult},
+    extract::json::Json,
+    status::{ApiResult, api_err::ApiErr},
 };
 
 use crate::service::{
@@ -13,10 +14,7 @@ use crate::service::{
     greeter::{ReqHello, RespHello},
 };
 
-pub async fn hello(
-    State(ctx): State<Arc<AppState>>,
-    Json(req): Json<ReqHello>,
-) -> ApiResult<RespHello> {
+pub async fn hello(State(ctx): State<Arc<AppState>>, Json(req): Json<ReqHello>) -> ApiResult<RespHello> {
     if let Err(e) = req.validate() {
         return Err(ApiErr::Params(e.to_string()));
     }

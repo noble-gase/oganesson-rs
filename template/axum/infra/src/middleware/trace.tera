@@ -1,5 +1,7 @@
+use std::sync::LazyLock;
+
 use axum::{extract::Request, http::HeaderValue, middleware::Next, response::Response};
-use http::{header::AUTHORIZATION, HeaderName};
+use http::{HeaderName, header::AUTHORIZATION};
 use tracing::Instrument;
 use uuid::Uuid;
 
@@ -7,33 +9,23 @@ use crate::util::iden::Identity;
 
 pub const TRACE_ID: HeaderName = HeaderName::from_static("x-trace-id");
 
-pub async fn handle(mut request: Request, next: Next) -> Response {
-    let hostname = hostname::get()
-        .unwrap_or_default()
-        .into_string()
-        .unwrap_or_default();
+static HOSTNAME: LazyLock<String> = LazyLock::new(|| hostname::get().ok().and_then(|s| s.into_string().ok()).unwrap_or_default());
 
+pub async fn trace_mw(mut req: Request, next: Next) -> Response {
     // 生成 TraceId
-    let trace_id = match request
-        .headers()
-        .get(TRACE_ID)
-        .and_then(|v| v.to_str().ok())
-    {
+    let trace_id = match req.headers().get(TRACE_ID).and_then(|v| v.to_str().ok()) {
         Some(v) => {
             if !v.is_empty() {
                 v.to_string()
             } else {
-                gen_trace_id(&mut request)
+                gen_trace_id(&mut req)
             }
         }
-        None => gen_trace_id(&mut request),
+        None => gen_trace_id(&mut req),
     };
 
     // 解析 Identity
-    let token = request
-        .headers()
-        .get(AUTHORIZATION)
-        .and_then(|v| v.to_str().ok());
+    let token = req.headers().get(AUTHORIZATION).and_then(|v| v.to_str().ok());
     let id = match token {
         None => Identity::default(),
         Some(v) => Identity::from_auth_token(v.to_string()),
@@ -41,24 +33,20 @@ pub async fn handle(mut request: Request, next: Next) -> Response {
     let id_str = id.to_string();
 
     // 设置 Identity
-    request.extensions_mut().insert(id);
+    req.extensions_mut().insert(id);
 
     // 设置 trace span
-    let span = tracing::info_span!("trace", hostname, trace_id, identity = id_str);
-    let mut response = next.run(request).instrument(span).await;
+    let span = tracing::info_span!("trace", hostname = HOSTNAME.as_str(), trace_id, identity = id_str);
+    let mut resp = next.run(req).instrument(span).await;
     // 设置 Header
-    response.headers_mut().insert(
-        TRACE_ID,
-        HeaderValue::from_str(&trace_id).unwrap_or(HeaderValue::from_static("")),
-    );
-    response
+    resp.headers_mut()
+        .insert(TRACE_ID, HeaderValue::from_str(&trace_id).unwrap_or(HeaderValue::from_static("")));
+    resp
 }
 
 fn gen_trace_id(req: &mut Request) -> String {
     let id = Uuid::new_v4().simple().to_string();
-    req.headers_mut().insert(
-        TRACE_ID,
-        HeaderValue::from_str(&id).unwrap_or(HeaderValue::from_static("")),
-    );
+    req.headers_mut()
+        .insert(TRACE_ID, HeaderValue::from_str(&id).unwrap_or(HeaderValue::from_static("")));
     id
 }

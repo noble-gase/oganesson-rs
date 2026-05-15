@@ -5,8 +5,7 @@ use std::{fs, sync::OnceLock};
 pub static CFG: OnceLock<Config> = OnceLock::new();
 
 pub fn init(cfg_file: &str) -> anyhow::Result<()> {
-    let path =
-        fs::canonicalize(cfg_file).with_context(|| format!("Config({}) init failed", cfg_file))?;
+    let path = fs::canonicalize(cfg_file).with_context(|| format!("Config({}) init failed", cfg_file))?;
 
     let cfg = Config::builder()
         .add_source(config::File::with_name(path.to_str().unwrap()))
@@ -19,6 +18,5 @@ pub fn init(cfg_file: &str) -> anyhow::Result<()> {
 }
 
 pub fn config() -> &'static Config {
-    CFG.get()
-        .unwrap_or_else(|| panic!("Config is not initialized"))
+    CFG.get().unwrap_or_else(|| panic!("Config is not initialized"))
 }

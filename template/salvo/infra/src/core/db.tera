@@ -10,21 +10,11 @@ pub async fn new(cfg_key: &str) -> anyhow::Result<Pool<MySql>> {
 
     let dsn = cfg.get_string(&format!("{}.dsn", cfg_key))?;
 
-    let min_conns = cfg
-        .get_int(&format!("{}.options.min_conns", cfg_key))
-        .unwrap_or(10);
-    let max_conns = cfg
-        .get_int(&format!("{}.options.max_conns", cfg_key))
-        .unwrap_or(20);
-    let conn_timeout = cfg
-        .get_int(&format!("{}.options.conn_timeout", cfg_key))
-        .unwrap_or(10);
-    let idle_timeout = cfg
-        .get_int(&format!("{}.options.idle_timeout", cfg_key))
-        .unwrap_or(300);
-    let max_lifetime = cfg
-        .get_int(&format!("{}.options.max_lifetime", cfg_key))
-        .unwrap_or(600);
+    let min_conns = cfg.get_int(&format!("{}.options.min_conns", cfg_key)).unwrap_or(10);
+    let max_conns = cfg.get_int(&format!("{}.options.max_conns", cfg_key)).unwrap_or(20);
+    let conn_timeout = cfg.get_int(&format!("{}.options.conn_timeout", cfg_key)).unwrap_or(10);
+    let idle_timeout = cfg.get_int(&format!("{}.options.idle_timeout", cfg_key)).unwrap_or(300);
+    let max_lifetime = cfg.get_int(&format!("{}.options.max_lifetime", cfg_key)).unwrap_or(600);
 
     let params = sql::Params {
         min_conns: Some(min_conns as u32),

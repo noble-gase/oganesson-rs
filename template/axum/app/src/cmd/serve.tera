@@ -1,16 +1,14 @@
 use std::sync::Arc;
 
-use infra::core::{config::config, AppState};
-use tokio::signal::unix::{signal, SignalKind};
+use infra::core::{AppState, config::config};
+use tokio::signal::unix::{SignalKind, signal};
 
 use crate::router;
 
 pub async fn run(state: Arc<AppState>) {
-    let addr = config().get_int("app.port").unwrap_or(8000);
+    let addr = config().get_string("app.addr").unwrap();
 
-    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", addr))
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
 
     tracing::info!("listening on {}", addr);
 

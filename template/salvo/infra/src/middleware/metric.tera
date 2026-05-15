@@ -1,17 +1,11 @@
 use std::{sync::LazyLock, time::Instant};
 
-use prometheus::{register_counter_vec, register_histogram_vec, CounterVec, HistogramVec};
-use salvo::{async_trait, Depot, FlowCtrl, Handler, Request, Response};
+use prometheus::{CounterVec, HistogramVec, register_counter_vec, register_histogram_vec};
+use salvo::{Depot, FlowCtrl, Handler, Request, Response, async_trait};
 
 /// 请求数量
-static REQUEST_COUNTER: LazyLock<CounterVec> = LazyLock::new(|| {
-    register_counter_vec!(
-        "requests_count",
-        "HTTP total requests",
-        &["method", "path", "status"]
-    )
-    .unwrap()
-});
+static REQUEST_COUNTER: LazyLock<CounterVec> =
+    LazyLock::new(|| register_counter_vec!("requests_count", "HTTP total requests", &["method", "path", "status"]).unwrap());
 
 /// 请求耗时
 static REQUEST_DURATION: LazyLock<HistogramVec> = LazyLock::new(|| {
@@ -25,24 +19,18 @@ static REQUEST_DURATION: LazyLock<HistogramVec> = LazyLock::new(|| {
 });
 
 #[derive(Default)]
-pub struct Metrics;
+pub struct Metric;
 
-impl Metrics {
+impl Metric {
     #[inline]
     pub fn new() -> Self {
-        Metrics {}
+        Metric {}
     }
 }
 
 #[async_trait]
-impl Handler for Metrics {
-    async fn handle(
-        &self,
-        req: &mut Request,
-        depot: &mut Depot,
-        resp: &mut Response,
-        ctrl: &mut FlowCtrl,
-    ) {
+impl Handler for Metric {
+    async fn handle(&self, req: &mut Request, depot: &mut Depot, resp: &mut Response, ctrl: &mut FlowCtrl) {
         let enter_time = Instant::now();
 
         let method = req.method().to_string();
@@ -53,9 +41,7 @@ impl Handler for Metrics {
         let duration = enter_time.elapsed();
         let status = resp.status_code.unwrap_or_default().as_u16().to_string();
 
-        REQUEST_COUNTER
-            .with_label_values(&[&method, &path, &status])
-            .inc();
+        REQUEST_COUNTER.with_label_values(&[&method, &path, &status]).inc();
         REQUEST_DURATION
             .with_label_values(&[&method, &path, &status])
             .observe(duration.as_millis() as f64);

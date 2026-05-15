@@ -1,0 +1,43 @@
+use std::{sync::LazyLock, time::Instant};
+
+use actix_web::{
+    Error,
+    body::MessageBody,
+    dev::{ServiceRequest, ServiceResponse},
+    middleware::Next,
+};
+use prometheus::{CounterVec, HistogramVec, register_counter_vec, register_histogram_vec};
+
+/// 请求数量
+static REQUEST_COUNTER: LazyLock<CounterVec> =
+    LazyLock::new(|| register_counter_vec!("requests_count", "HTTP total requests", &["method", "path", "status"]).unwrap());
+
+/// 请求耗时
+static REQUEST_DURATION: LazyLock<HistogramVec> = LazyLock::new(|| {
+    register_histogram_vec!(
+        "request_duration",
+        "HTTP request duration (ms)",
+        &["method", "path", "status"],
+        vec![5.0, 10.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0]
+    )
+    .unwrap()
+});
+
+pub async fn metric_mw(req: ServiceRequest, next: Next<impl MessageBody>) -> Result<ServiceResponse<impl MessageBody>, Error> {
+    let enter_time = Instant::now();
+
+    let method = req.method().to_string();
+    let path = req.uri().path().to_string();
+
+    let resp = next.call(req).await?;
+
+    let duration = enter_time.elapsed();
+    let status = resp.status().as_u16().to_string();
+
+    REQUEST_COUNTER.with_label_values(&[&method, &path, &status]).inc();
+    REQUEST_DURATION
+        .with_label_values(&[&method, &path, &status])
+        .observe(duration.as_millis() as f64);
+
+    Ok(resp)
+}

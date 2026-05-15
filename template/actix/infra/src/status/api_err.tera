@@ -1,0 +1,53 @@
+use actix_web::{HttpResponse, ResponseError, http::StatusCode};
+use thiserror::Error;
+
+use crate::status::ApiBody;
+
+#[derive(Debug, Error)]
+pub enum ApiErr {
+    #[error("invalid parameters: {0}")]
+    Params(String),
+
+    #[error("unauthorized")]
+    Unauthorized,
+
+    #[error("{0} not found")]
+    NotFound(String),
+
+    #[error("panic occurred")]
+    Panic,
+
+    #[error("internal server error")]
+    System(#[from] anyhow::Error),
+}
+
+impl ApiErr {
+    // 映射到业务错误码
+    pub fn code(&self) -> i32 {
+        match self {
+            ApiErr::Params(_) => 10000,
+            ApiErr::Unauthorized => 20000,
+            ApiErr::NotFound(_) => 40000,
+            ApiErr::Panic => 50000,
+            ApiErr::System(_) => 50000,
+        }
+    }
+}
+
+impl ResponseError for ApiErr {
+    fn status_code(&self) -> StatusCode {
+        StatusCode::OK
+    }
+
+    fn error_response(&self) -> HttpResponse {
+        if let ApiErr::System(e) = self {
+            tracing::error!(error = ?e)
+        }
+        let body = ApiBody::<()> {
+            code: self.code(),
+            msg: self.to_string(),
+            data: None,
+        };
+        HttpResponse::Ok().json(body)
+    }
+}

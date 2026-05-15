@@ -12,11 +12,7 @@ struct LocalTimer;
 impl FormatTime for LocalTimer {
     fn format_time(&self, w: &mut Writer<'_>) -> std::fmt::Result {
         let now = jiff::Zoned::now();
-        write!(
-            w,
-            "{}",
-            strtime::format("%Y-%m-%d %H:%M:%S%.3f", &now).unwrap_or_default()
-        )
+        write!(w, "{}", strtime::format("%Y-%m-%d %H:%M:%S%.3f", &now).unwrap_or_default())
     }
 }
 
@@ -41,8 +37,7 @@ pub fn init() -> WorkerGuard {
                 // 参考: https://docs.rs/tracing-appender/latest/tracing_appender/index.html
                 tracing_appender::non_blocking(tracing_appender::rolling::daily(
                     cfg.get_string("log.path").unwrap_or(String::from("logs")),
-                    cfg.get_string("log.filename")
-                        .unwrap_or(String::from("tracing.log")),
+                    cfg.get_string("log.filename").unwrap_or(String::from("tracing.log")),
                 ))
             };
 

@@ -1,0 +1,71 @@
+pub mod route;
+
+use std::sync::Arc;
+
+use actix_cors::Cors;
+use actix_web::{
+    HttpResponse, ResponseError,
+    dev::HttpServiceFactory,
+    error::InternalError,
+    middleware::from_fn,
+    web::{self, ServiceConfig},
+};
+use prometheus::{Encoder, TextEncoder};
+
+use infra::{
+    self,
+    core::AppState,
+    middleware::{
+        log, metric, panic,
+        trace::{self, TRACE_ID},
+    },
+    status::api_err::ApiErr,
+};
+
+pub fn init(state: Arc<AppState>) -> impl FnOnce(&mut ServiceConfig) + Clone + 'static {
+    move |cfg: &mut ServiceConfig| {
+        cfg.route("/", web::get().to(root))
+            .route("/health", web::get().to(health))
+            .route("/metrics", web::get().to(metric))
+            .service(router(state));
+    }
+}
+
+async fn root() -> &'static str {
+    "☺ welcome to Rust app"
+}
+
+async fn health() -> &'static str {
+    "ok"
+}
+
+async fn metric() -> HttpResponse {
+    let encoder = TextEncoder::new();
+    let metric_families = prometheus::gather();
+
+    let mut buffer = Vec::new();
+    encoder.encode(&metric_families, &mut buffer).unwrap();
+
+    HttpResponse::Ok().body(String::from_utf8(buffer).unwrap())
+}
+
+pub fn router(state: Arc<AppState>) -> impl HttpServiceFactory {
+    let data = web::Data::from(state);
+    let cors = Cors::permissive().expose_headers([TRACE_ID]);
+
+    // JSON 解析错误处理
+    let json_config = web::JsonConfig::default().error_handler(|err, _req| {
+        let api_err = ApiErr::Params(format!("Failed to parse the request body as JSON: {err}"));
+        InternalError::from_response(err, api_err.error_response()).into()
+    });
+
+    web::scope("")
+        .app_data(data)
+        .app_data(json_config)
+        .wrap(panic::Catch)
+        .wrap(log::Log)
+        .wrap(from_fn(trace::trace_mw))
+        .wrap(from_fn(metric::metric_mw))
+        .wrap(cors)
+        .service(route::v1())
+}

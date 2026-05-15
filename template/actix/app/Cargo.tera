@@ -1,0 +1,24 @@
+[package]
+name = "{{ app_crate }}"
+description = "{{ app_crate }} crate"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+infra = { workspace = true }
+repo = { workspace = true }
+anyhow = { workspace = true }
+futures = { workspace = true }
+tokio = { workspace = true }
+clap = { workspace = true }
+tracing = { workspace = true }
+figlet-rs = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+prometheus = { workspace = true }
+validator = { workspace = true }
+actix-web = { workspace = true }
+actix-cors = { workspace = true }
+kr = { workspace = true }

@@ -1,7 +1,7 @@
 use std::panic::AssertUnwindSafe;
 
 use futures::FutureExt;
-use salvo::{async_trait, Depot, FlowCtrl, Handler, Request, Response, Writer};
+use salvo::{Depot, FlowCtrl, Handler, Request, Response, Writer, async_trait};
 
 use crate::status::api_err::ApiErr;
 
@@ -17,16 +17,8 @@ impl Catch {
 
 #[async_trait]
 impl Handler for Catch {
-    async fn handle(
-        &self,
-        req: &mut Request,
-        depot: &mut Depot,
-        resp: &mut Response,
-        ctrl: &mut FlowCtrl,
-    ) {
-        let ret = AssertUnwindSafe(ctrl.call_next(req, depot, resp))
-            .catch_unwind()
-            .await;
+    async fn handle(&self, req: &mut Request, depot: &mut Depot, resp: &mut Response, ctrl: &mut FlowCtrl) {
+        let ret = AssertUnwindSafe(ctrl.call_next(req, depot, resp)).catch_unwind().await;
         if ret.is_err() {
             ApiErr::Panic.write(req, depot, resp).await;
         }

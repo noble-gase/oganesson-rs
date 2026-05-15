@@ -1,0 +1,19 @@
+use actix_web::web;
+use validator::Validate;
+
+use infra::{
+    core::AppState,
+    status::{ApiResult, api_err::ApiErr},
+};
+
+use crate::service::{
+    self,
+    greeter::{ReqHello, RespHello},
+};
+
+pub async fn hello(ctx: web::Data<AppState>, params: web::Json<ReqHello>) -> ApiResult<RespHello> {
+    if let Err(e) = params.validate() {
+        return Err(ApiErr::Params(e.to_string()));
+    }
+    service::greeter::hello(ctx.get_ref(), params.into_inner()).await
+}

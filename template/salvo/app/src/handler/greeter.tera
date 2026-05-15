@@ -2,12 +2,12 @@ use std::sync::Arc;
 
 use anyhow::Context;
 use kr::make_ctx;
-use salvo::{handler, Depot, Request};
+use salvo::{Depot, Request, handler};
 use validator::Validate;
 
 use infra::{
     core::AppState,
-    status::{api_err::ApiErr, ApiResult},
+    status::{ApiResult, api_err::ApiErr},
 };
 
 use crate::service::{
@@ -20,14 +20,13 @@ pub async fn hello(depot: &mut Depot, req: &mut Request) -> ApiResult<RespHello>
     let params = req
         .parse_json::<ReqHello>()
         .await
-        .with_context(|| make_ctx("request body parsed failed"))?;
+        .with_context(|| make_ctx("Failed to parse the request body as JSON"))?;
 
     if let Err(e) = params.validate() {
         return Err(ApiErr::Params(e.to_string()));
     }
 
     let ctx = depot.obtain::<Arc<AppState>>().unwrap();
-    // let iden = depot.obtain::<Identity>().unwrap();
 
     service::greeter::hello(ctx, params).await
 }

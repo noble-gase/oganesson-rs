@@ -9,21 +9,11 @@ pub async fn new(cfg_key: &str) -> anyhow::Result<redix::SinglePool> {
 
     let dsn = cfg.get_string(&format!("{}.dsn", cfg_key))?;
 
-    let max_size = cfg
-        .get_int(&format!("{}.options.max_size", cfg_key))
-        .unwrap_or(100);
-    let min_idle = cfg
-        .get_int(&format!("{}.options.min_idle", cfg_key))
-        .unwrap_or(10);
-    let conn_timeout = cfg
-        .get_int(&format!("{}.options.conn_timeout", cfg_key))
-        .unwrap_or(10);
-    let idle_timeout = cfg
-        .get_int(&format!("{}.options.idle_timeout", cfg_key))
-        .unwrap_or(300);
-    let max_lifetime = cfg
-        .get_int(&format!("{}.options.max_lifetime", cfg_key))
-        .unwrap_or(600);
+    let max_size = cfg.get_int(&format!("{}.options.max_size", cfg_key)).unwrap_or(100);
+    let min_idle = cfg.get_int(&format!("{}.options.min_idle", cfg_key)).unwrap_or(10);
+    let conn_timeout = cfg.get_int(&format!("{}.options.conn_timeout", cfg_key)).unwrap_or(10);
+    let idle_timeout = cfg.get_int(&format!("{}.options.idle_timeout", cfg_key)).unwrap_or(300);
+    let max_lifetime = cfg.get_int(&format!("{}.options.max_lifetime", cfg_key)).unwrap_or(600);
 
     let params = redix::Params {
         max_size: Some(max_size as u32),

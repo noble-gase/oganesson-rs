@@ -1,6 +1,6 @@
 [package]
-name = "{{ app_name }}"
-description = "{{ app_name }} crate"
+name = "{{ app_crate }}"
+description = "{{ app_crate }} crate"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
@@ -14,6 +14,7 @@ futures = { workspace = true }
 tokio = { workspace = true }
 clap = { workspace = true }
 tracing = { workspace = true }
+figlet-rs = { workspace = true }
 serde = { workspace = true }
 prometheus = { workspace = true }
 validator = { workspace = true }

@@ -1,4 +1,4 @@
-use salvo::{prelude::*, Depot, Request, Response, Writer};
+use salvo::{Depot, Request, Response, Writer, prelude::*};
 use thiserror::Error;
 
 use crate::status::ApiBody;

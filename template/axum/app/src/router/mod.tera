@@ -3,16 +3,24 @@ pub mod route;
 use std::sync::Arc;
 
 use axum::{routing::get, Router};
-use infra::core::AppState;
 use prometheus::{Encoder, TextEncoder};
 use tower_http::cors::CorsLayer;
+
+use infra::{
+    self,
+    core::AppState,
+    middleware::{
+        log, metric, panic,
+        trace::{self, TRACE_ID},
+    },
+};
 
 pub fn init() -> Router<Arc<AppState>> {
     // 路由组册
     Router::new()
         .route("/", get(|| async { "☺ welcome to Rust app" }))
         .route("/health", get(health))
-        .route("/metrics", get(metrics))
+        .route("/metrics", get(metric))
         .merge(router())
 }
 
@@ -20,7 +28,7 @@ async fn health() -> &'static str {
     "ok"
 }
 
-async fn metrics() -> String {
+async fn metric() -> String {
     let encoder = TextEncoder::new();
     let metric_families = prometheus::gather();
 
@@ -31,15 +39,13 @@ async fn metrics() -> String {
 }
 
 fn router() -> Router<Arc<AppState>> {
-    let cors = CorsLayer::permissive().expose_headers(vec![infra::middleware::trace::TRACE_ID]);
+    let cors = CorsLayer::permissive().expose_headers(vec![TRACE_ID]);
 
     Router::new()
         .nest("/v1", route::v1())
-        .layer(axum::middleware::from_fn(infra::middleware::panic::handle))
-        .layer(axum::middleware::from_fn(infra::middleware::log::handle))
-        .layer(axum::middleware::from_fn(infra::middleware::trace::handle))
-        .layer(axum::middleware::from_fn(
-            infra::middleware::metrics::handle,
-        ))
+        .layer(axum::middleware::from_fn(panic::catch_mw))
+        .layer(axum::middleware::from_fn(log::log_mw))
+        .layer(axum::middleware::from_fn(trace::trace_mw))
+        .layer(axum::middleware::from_fn(metric::metric_mw))
         .layer(cors)
 }
