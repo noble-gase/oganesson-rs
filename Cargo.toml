@@ -1,6 +1,6 @@
 [package]
 name = "rnx"
-version = "0.8.0"
+version = "0.8.1"
 edition = "2024"
 authors = ["ShengHui <847713844@qq.com>"]
 description = "The Rust web development scaffold, support salvo and axum"
