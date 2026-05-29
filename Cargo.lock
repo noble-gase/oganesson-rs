@@ -462,7 +462,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "ogx"
+name = "oganesson-rs"
 version = "0.0.1"
 dependencies = [
  "clap",

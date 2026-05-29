@@ -1,14 +1,14 @@
-# 氡-Rn
+# oganesson-rs
 
-[<img alt="crates.io" src="https://img.shields.io/crates/v/ogx.svg?style=for-the-badge&color=fc8d62&logo=rust" height="20">](https://crates.io/crates/ogx)
+[<img alt="crates.io" src="https://img.shields.io/crates/v/oganesson-rs.svg?style=for-the-badge&color=fc8d62&logo=rust" height="20">](https://crates.io/crates/oganesson-rs)
 [<img alt="MIT" src="http://img.shields.io/badge/license-MIT-brightgreen.svg?style=for-the-badge" height="20">](http://opensource.org/licenses/MIT)
 
-[氡-Rn] Rust Web开发脚手架，支持 `actix-web`、 `axum` 和 `salvo` 框架，并支持「单应用」和「多应用」模式
+[鿫-Oganesson] Rust Web开发脚手架，支持 `actix-web`、 `axum` 和 `salvo` 框架，并支持「单应用」和「多应用」模式
 
 ## 安装
 
 ```shell
-cargo install ogx
+cargo install oganesson-rs
 ```
 
 ## 特点
@@ -30,16 +30,16 @@ cargo install ogx
 
 ```shell
 # actix-web
-ogx new # 在当前目录初始化项目
-ogx new --name demo # 创建demo项目
+og new # 在当前目录初始化项目
+og new --name demo # 创建demo项目
 
 # axum
-ogx new --axum # 在当前目录初始化项目
-ogx new --name demo --axum # 创建demo项目
+og new --axum # 在当前目录初始化项目
+og new --name demo --axum # 创建demo项目
 
 # salvo
-ogx new --salvo # 在当前目录初始化项目
-ogx new --name demo --salvo # 创建demo项目
+og new --salvo # 在当前目录初始化项目
+og new --name demo --salvo # 创建demo项目
 
 .
 ├── Cargo.toml
@@ -75,16 +75,16 @@ ogx new --name demo --salvo # 创建demo项目
 
 ```shell
 # actix-web
-ogx new --app foo --app bar # 在当前目录初始化项目
-ogx new --name demo --app foo --app bar # 创建demo项目
+og new --app foo --app bar # 在当前目录初始化项目
+og new --name demo --app foo --app bar # 创建demo项目
 
 # axum
-ogx new --app foo --app bar --axum # 在当前目录初始化项目
-ogx new --name demo --app foo --app bar --axum # 创建demo项目
+og new --app foo --app bar --axum # 在当前目录初始化项目
+og new --name demo --app foo --app bar --axum # 创建demo项目
 
 # salvo
-ogx new --app foo --app bar --salvo # 在当前目录初始化项目
-ogx new --name demo --app foo --app bar --salvo # 创建demo项目
+og new --app foo --app bar --salvo # 在当前目录初始化项目
+og new --name demo --app foo --app bar --salvo # 创建demo项目
 
 .
 ├── Cargo.toml
@@ -129,13 +129,13 @@ ogx new --name demo --app foo --app bar --salvo # 创建demo项目
 
 ```shell
 # actix-web
-ogx app --name foo --name bar
+og app --name foo --name bar
 
 # axum
-ogx app --name foo --name bar --axum
+og app --name foo --name bar --axum
 
 # salvo
-ogx app --name foo --name --salvo bar
+og app --name foo --name --salvo bar
 
 .
 ├── Cargo.toml
