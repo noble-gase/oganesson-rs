@@ -1,21 +1,21 @@
 use std::time::Duration;
 
-use kr::redix;
+use neon_rs::redis::client::{self, Params, Single, SinglePool};
 
 use crate::core::config::config;
 
-pub async fn new(cfg_key: &str) -> anyhow::Result<redix::SinglePool> {
+pub async fn new(cfg_key: &str) -> anyhow::Result<SinglePool> {
     let cfg = config();
 
-    let dsn = cfg.get_string(&format!("{}.dsn", cfg_key))?;
+    let dsn = cfg.get_string(&format!("{cfg_key}.dsn"))?;
 
-    let max_size = cfg.get_int(&format!("{}.options.max_size", cfg_key)).unwrap_or(100);
-    let min_idle = cfg.get_int(&format!("{}.options.min_idle", cfg_key)).unwrap_or(10);
-    let conn_timeout = cfg.get_int(&format!("{}.options.conn_timeout", cfg_key)).unwrap_or(10);
-    let idle_timeout = cfg.get_int(&format!("{}.options.idle_timeout", cfg_key)).unwrap_or(300);
-    let max_lifetime = cfg.get_int(&format!("{}.options.max_lifetime", cfg_key)).unwrap_or(600);
+    let max_size = cfg.get_int(&format!("{cfg_key}.options.max_size")).unwrap_or(100);
+    let min_idle = cfg.get_int(&format!("{cfg_key}.options.min_idle")).unwrap_or(10);
+    let conn_timeout = cfg.get_int(&format!("{cfg_key}.options.conn_timeout")).unwrap_or(10);
+    let idle_timeout = cfg.get_int(&format!("{cfg_key}.options.idle_timeout")).unwrap_or(300);
+    let max_lifetime = cfg.get_int(&format!("{cfg_key}.options.max_lifetime")).unwrap_or(600);
 
-    let params = redix::Params {
+    let params = Params {
         max_size: Some(max_size as u32),
         min_idle: Some(min_idle as u32),
         conn_timeout: Some(Duration::from_secs(conn_timeout as u64)),
@@ -23,7 +23,7 @@ pub async fn new(cfg_key: &str) -> anyhow::Result<redix::SinglePool> {
         max_lifetime: Some(Duration::from_secs(max_lifetime as u64)),
     };
 
-    let pool = redix::open::<redix::Single>(vec![dsn], Some(params)).await?;
+    let pool = client::open::<Single>(vec![dsn], Some(params)).await?;
 
     Ok(pool)
 }

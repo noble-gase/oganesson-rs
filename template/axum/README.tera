@@ -1,4 +1,4 @@
-# rnx
+# ogx
 
 基于 [axum](https://github.com/tokio-rs/axum) 的 Rust API 开发脚手架
 

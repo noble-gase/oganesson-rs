@@ -4,7 +4,7 @@ use anyhow::Context;
 use http_body_util::BodyExt;
 use hyper::HeaderMap;
 use jiff::Zoned;
-use kr::make_ctx;
+use neon_rs::core::ctx::wrap;
 use salvo::{
     Depot, FlowCtrl, Handler, Request, Response, Writer, async_trait,
     http::{ReqBody, ResBody},
@@ -85,7 +85,7 @@ async fn drain_req_body(req: &mut Request) -> Result<Option<String>, ApiErr> {
     let bytes = body
         .collect()
         .await
-        .with_context(|| make_ctx("request body collect failed"))?
+        .with_context(|| wrap("request body collect failed"))?
         .to_bytes();
 
     // 处理 Body

@@ -21,4 +21,4 @@ prometheus = { workspace = true }
 validator = { workspace = true }
 actix-web = { workspace = true }
 actix-cors = { workspace = true }
-kr = { workspace = true }
+neon-rs = { workspace = true }

@@ -1,9 +1,6 @@
 use std::{env, fs};
 
-use crate::{
-    cmd::Kind,
-    core::{self, gen_members},
-};
+use crate::{cmd::Kind, core};
 
 pub fn run(apps: Vec<String>, kind: Kind) {
     // 检查Cargo.toml是否存在
@@ -11,8 +8,6 @@ pub fn run(apps: Vec<String>, kind: Kind) {
         println!("👿 Cargo.toml does not exist, please confirm!");
         return;
     }
-
-    let members = gen_members(&apps, None);
 
     // 获取当前目录
     let dir = env::current_dir().unwrap().canonicalize().unwrap();
@@ -23,5 +18,5 @@ pub fn run(apps: Vec<String>, kind: Kind) {
         _ => core::build_actix_app(&dir, apps),
     }
 
-    println!("🦀 The app is now created! Please add `{members}` to workspace members");
+    println!("🦀 The app is now created!");
 }

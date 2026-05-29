@@ -1,7 +1,6 @@
-use sea_query::*;
+use sea_query::Iden;
 
 // For example Demo table with column id, name...
-#[derive(Iden)]
 pub enum Demo {
     Table,
     Id,
@@ -11,14 +10,14 @@ pub enum Demo {
 }
 
 // Mapping between Enum variant and its corresponding string value
-// impl Iden for Demo {
-//     fn unquoted(&self) -> &str {
-//         match self {
-//             Self::Table => "demo",
-//             Self::Id => "id",
-//             Self::Name => "name",
-//             Self::CreatedAt => "created_at",
-//             Self::UpdatedAt => "updated_at",
-//         }
-//     }
-// }
+impl Iden for Demo {
+    fn unquoted(&self) -> &str {
+        match self {
+            Self::Table => "demo",
+            Self::Id => "id",
+            Self::Name => "name",
+            Self::CreatedAt => "created_at",
+            Self::UpdatedAt => "updated_at",
+        }
+    }
+}

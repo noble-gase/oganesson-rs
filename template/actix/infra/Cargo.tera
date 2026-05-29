@@ -6,10 +6,6 @@ edition.workspace = true
 authors.workspace = true
 repository.workspace = true
 
-[lib]
-name = "infra"
-path = "src/lib.rs"
-
 [dependencies]
 anyhow = { workspace = true }
 thiserror = { workspace = true }
@@ -34,4 +30,4 @@ sea-query = { workspace = true }
 prometheus = { workspace = true }
 validator = { workspace = true }
 actix-web = { workspace = true }
-kr = { workspace = true }
+neon-rs = { workspace = true }

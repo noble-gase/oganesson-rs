@@ -23,4 +23,4 @@ http = { workspace = true }
 http-body = { workspace = true }
 http-body-util = { workspace = true }
 salvo = { workspace = true }
-kr = { workspace = true }
+neon-rs = { workspace = true }

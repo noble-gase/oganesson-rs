@@ -4,11 +4,12 @@ pub mod middleware;
 pub mod router;
 pub mod service;
 
-use std::{panic, sync::Arc};
+use std::{panic, sync::Arc, time::Duration};
 
 use clap::Parser;
 use figlet_rs::FIGlet;
 use infra::core::{AppState, config, logger};
+use neon_rs::sql::set_sql_logger;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -27,6 +28,19 @@ async fn main() -> anyhow::Result<()> {
     panic::set_hook(Box::new(|e| {
         tracing::error!(panic = %e);
     }));
+
+    set_sql_logger(|sql, cost, err| match err {
+        Some(e) => {
+            tracing::error!(sql = sql, cost_ms = cost.as_millis(), err = %e, "sql error");
+        }
+        None => {
+            if cost > Duration::from_millis(200) {
+                tracing::warn!(sql = sql, cost_ms = cost.as_millis(), "slow sql");
+            } else {
+                tracing::info!(sql = sql, cost_ms = cost.as_millis(), "sql");
+            }
+        }
+    });
 
     let state = Arc::new(AppState::default());
     // let state = Arc::new(AppState::new().await?);

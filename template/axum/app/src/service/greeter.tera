@@ -1,5 +1,5 @@
 // use anyhow::Context;
-// use kr::make_ctx;
+// use neon_rs::core::ctx::wrap;
 // use repo::{dao::demo, schema::model};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -23,7 +23,7 @@ pub struct RespHello {
 pub async fn hello(_ctx: &AppState, req: ReqHello) -> ApiResult<RespHello> {
     // let ret = demo::get_by_id::<model::Demo>(ctx, 1, None)
     //     .await
-    //     .with_context(|| make_ctx("demo::get_by_id failed"))?;
+    //     .with_context(|| wrap("demo::get_by_id failed"))?;
 
     let resp = RespHello {
         message: format!("Hello, {}!", req.name),

@@ -177,7 +177,7 @@ fn build_app(root: &Path, name: &str, crate_name: Option<&str>, template: tera::
     }
 }
 
-pub fn gen_members(apps: &Vec<String>, base: Option<Vec<String>>) -> String {
+pub fn gen_members(apps: &[String], base: Option<Vec<String>>) -> String {
     let mut members = Vec::new();
 
     if let Some(list) = base {
@@ -189,9 +189,7 @@ pub fn gen_members(apps: &Vec<String>, base: Option<Vec<String>>) -> String {
     if apps.is_empty() {
         members.push("app".to_string())
     } else {
-        for v in apps {
-            members.push(format!("app/{v}"));
-        }
+        members.push("app/*".to_string())
     }
 
     format!("[{}]", members.iter().map(|m| format!("\"{}\"", m)).collect::<Vec<_>>().join(", "))

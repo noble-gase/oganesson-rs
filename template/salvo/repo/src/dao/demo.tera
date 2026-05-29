@@ -1,23 +1,17 @@
 use infra::core::AppState;
-use kr::sql::mysql;
-use sea_query::{Expr, Query};
+use neon_rs::sql::mysql;
+use sea_query::{Expr, ExprTrait, Query};
 use sqlx::{FromRow, mysql::MySqlRow};
 
-use crate::schema::table;
+use crate::schema::table::Demo;
 
-pub async fn get_by_id<T>(
-    ctx: &AppState,
-    id: i64,
-    cols: Option<Vec<table::Demo>>,
-) -> anyhow::Result<Option<T>>
+pub async fn get_by_id<T>(ctx: &AppState, id: i64, cols: Option<Vec<Demo>>) -> anyhow::Result<Option<T>>
 where
     T: for<'r> FromRow<'r, MySqlRow> + Send + Unpin,
 {
     let mut query = Query::select();
 
-    let stmt = query
-        .from(table::Demo::Table)
-        .and_where(Expr::col(table::Demo::Id).eq(id));
+    let stmt = query.from(Demo::Table).and_where(Expr::col(Demo::Id).eq(id));
 
     if let Some(v) = cols {
         stmt.columns(v);

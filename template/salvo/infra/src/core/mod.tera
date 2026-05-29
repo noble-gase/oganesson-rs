@@ -4,12 +4,13 @@ pub mod db;
 pub mod logger;
 
 use anyhow::Context;
-use kr::redix;
+use neon_rs::redis::pool::SinglePool;
+use sqlx::MySqlPool;
 
 #[derive(Clone, Default)]
 pub struct AppState {
-    db_default: Option<sqlx::MySqlPool>,
-    redis_default: Option<redix::SinglePool>,
+    db_default: Option<MySqlPool>,
+    redis_default: Option<SinglePool>,
 }
 
 impl AppState {
@@ -28,7 +29,7 @@ impl AppState {
         self.db_default.as_ref().expect("DB(default) is None (forgotten initialize?)")
     }
 
-    pub fn redis(&self) -> &redix::SinglePool {
+    pub fn redis(&self) -> &SinglePool {
         self.redis_default
             .as_ref()
             .expect("Redis(default) is None (forgotten initialize?)")

@@ -1,13 +1,13 @@
 [workspace]
-resolver = "2"
+resolver = "3"
 members = {{ members }}
 
 [workspace.package]
-description = "Rust api build with rnx"
-version = "0.1.0"
+description = "Rust api build with ogx"
+version = "0.0.1"
 edition = "2024"
 authors = ["ShengHui <847713844@qq.com>"]
-repository = "https://github.com/noble-gase/rn"
+repository = "https://github.com/noble-gase/oganesson-rs"
 
 [workspace.dependencies]
 infra = { path = "infra" }
@@ -16,7 +16,7 @@ anyhow = "1"
 thiserror = "2"
 futures = "0.3"
 tokio = { version = "1", features = ["full"] }
-clap = { version = "4.5", features = ["derive"] }
+clap = { version = "4.6", features = ["derive"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["json"] }
 tracing-appender = "0.2"
@@ -24,19 +24,24 @@ figlet-rs = "1"
 hostname = "^0.4"
 rand = "0.10"
 base64 = "0.22"
-bcrypt = "0.15"
+bcrypt = "0.19"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-config = "0.14"
+config = "0.15"
 jiff = "0.2"
 time = { version = "0.3", features = ["serde"] }
 bb8 = "0.9"
-uuid = { version = "1.18", features = ["v4"] }
-sqlx = { version = "0.8", features = ["runtime-tokio", "time"] }
-redis = { version = "0.32", features = ["tokio-comp"] }
-sea-query = "0.32"
+uuid = { version = "1.23", features = ["v4"] }
+sqlx = { version = "0.9", features = ["runtime-tokio", "time"] }
+redis = { version = "1.2", features = ["tokio-comp"] }
+sea-query = { version = "1.0.0-rc.34", git = "https://github.com/SeaQL/sea-query", rev = "9da59def0025" }
 prometheus = { version = "0.14", features = ["process"] }
-validator = { version = "0.16", features = ["derive"] }
+validator = { version = "0.20", features = ["derive"] }
 actix-web = "4"
 actix-cors = "0.7"
-kr = { version = "0.8", features = ["macros"] }
+neon-rs = { version = "0.0.1", git = "https://github.com/noble-gase/neon-rs", rev = "7c9bce93f59961e5dd8b04d67f70a1d76f366379", features = [
+    "crypto-aes",
+    "macros",
+    "redis",
+    "sql-mysql",
+] }

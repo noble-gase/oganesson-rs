@@ -1,7 +1,7 @@
 use anyhow::Result;
 use base64::{Engine, prelude::BASE64_STANDARD};
 use jiff::Zoned;
-use kr::crypto::aes::CBC;
+use neon_rs::crypto::aes::{aes_decrypt_cbc, aes_encrypt_cbc};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::fmt::Display;
@@ -53,8 +53,7 @@ impl Identity {
         };
         let key = secret.as_bytes();
 
-        let cbc = CBC::new(key, &key[..16]);
-        let plain = match cbc.decrypt(&cipher) {
+        let plain = match aes_decrypt_cbc(key, &key[..16], &cipher) {
             Err(e) => {
                 tracing::error!(err = ?e, "invalid auth_token");
                 return Identity::default();
@@ -74,8 +73,7 @@ impl Identity {
         let secret = config().get_string("app.secret")?;
         let key = secret.as_bytes();
 
-        let cbc = CBC::new(key, &key[..16]);
-        let cipher = cbc.encrypt(&plain, None)?;
+        let cipher = aes_encrypt_cbc(key, &key[..16], &plain, None)?;
 
         Ok(BASE64_STANDARD.encode(cipher))
     }

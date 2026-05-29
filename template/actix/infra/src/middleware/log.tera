@@ -12,7 +12,7 @@ use actix_web::{
 use futures::StreamExt;
 use futures::future::LocalBoxFuture;
 use jiff::Zoned;
-use kr::make_ctx;
+use neon_rs::core::ctx::wrap;
 use serde_json::Value;
 
 use crate::status::api_err::ApiErr;
@@ -128,7 +128,7 @@ async fn drain_req_body(req: &mut ServiceRequest) -> Result<Option<String>, ApiE
     let mut buf = BytesMut::new();
     while let Some(chunk) = payload.next().await {
         let chunk =
-            chunk.map_err(|e| ApiErr::System(anyhow::Error::msg(e.to_string()).context(make_ctx("request body collect failed"))))?;
+            chunk.map_err(|e| ApiErr::System(anyhow::Error::msg(e.to_string()).context(wrap("request body collect failed"))))?;
         buf.extend_from_slice(&chunk);
     }
     let bytes = buf.freeze();

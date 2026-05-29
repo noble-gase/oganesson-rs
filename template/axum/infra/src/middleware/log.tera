@@ -10,7 +10,7 @@ use axum::{
 use http_body_util::BodyExt;
 use hyper::HeaderMap;
 use jiff::Zoned;
-use kr::make_ctx;
+use neon_rs::core::ctx::wrap;
 use serde_json::Value;
 
 use crate::status::api_err::ApiErr;
@@ -66,7 +66,7 @@ async fn drain_body(request: Request, next: Next) -> Result<(Response, (Option<S
     let req_bytes = req_body
         .collect()
         .await
-        .with_context(|| make_ctx("request body collect failed"))?
+        .with_context(|| wrap("request body collect failed"))?
         .to_bytes();
     // 处理 Body
     let req_body_str = std::str::from_utf8(&req_bytes[..req_bytes.len().min(MAX_LOG_SIZE)])
@@ -92,7 +92,7 @@ async fn drain_body(request: Request, next: Next) -> Result<(Response, (Option<S
     let resp_bytes = resp_body
         .collect()
         .await
-        .with_context(|| make_ctx("response body collect failed"))?
+        .with_context(|| wrap("response body collect failed"))?
         .to_bytes();
     // 处理 Body
     let resp_body_str = std::str::from_utf8(&resp_bytes[..resp_bytes.len().min(MAX_LOG_SIZE)])

@@ -5,7 +5,7 @@ debug = false
 secret = "3f4e25e75c08dbf60ad6533c50167ce3"
 
 [db]
-dsn = "mysql://username:password@127.0.0.1:3306/dbname&charset=utf8mb4&parseTime=True&loc=Local"
+dsn = "mysql://username:password@127.0.0.1:3306/dbname?charset=utf8mb4&parseTime=True&loc=Local"
 options = { min_conns = 10, max_conns = 100, conn_timeout = 10, idle_timeout = 300, max_lifetime = 600 }
 
 [redis]

@@ -25,4 +25,4 @@ http-body-util = { workspace = true }
 tower-http = { workspace = true }
 axum = { workspace = true }
 axum-extra = { workspace = true }
-kr = { workspace = true }
+neon-rs = { workspace = true }
