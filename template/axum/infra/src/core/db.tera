@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use neon_rs::sql::client::{self, MySQL, Params};
+use neon_rs::sql::{self, PoolParams, factory::MySQL};
 use sqlx::{MySql, Pool};
 
 use crate::core::config::config;
@@ -16,7 +16,7 @@ pub async fn new(cfg_key: &str) -> anyhow::Result<Pool<MySql>> {
     let idle_timeout = cfg.get_int(&format!("{cfg_key}.options.idle_timeout")).unwrap_or(300);
     let max_lifetime = cfg.get_int(&format!("{cfg_key}.options.max_lifetime")).unwrap_or(600);
 
-    let params = Params {
+    let params = PoolParams {
         min_conns: Some(min_conns as u32),
         max_conns: Some(max_conns as u32),
         conn_timeout: Some(Duration::from_secs(conn_timeout as u64)),
@@ -24,7 +24,7 @@ pub async fn new(cfg_key: &str) -> anyhow::Result<Pool<MySql>> {
         max_lifetime: Some(Duration::from_secs(max_lifetime as u64)),
     };
 
-    let pool = client::open::<MySQL>(dsn, Some(params)).await?;
+    let pool = sql::open::<MySQL>(dsn, Some(params)).await?;
 
     Ok(pool)
 }

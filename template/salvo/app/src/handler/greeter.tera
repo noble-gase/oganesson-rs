@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use anyhow::Context;
-use kr::make_ctx;
+use neon_rs::core::ctx::wrap;
 use salvo::{Depot, Request, handler};
 use validator::Validate;
 
@@ -20,7 +20,7 @@ pub async fn hello(depot: &mut Depot, req: &mut Request) -> ApiResult<RespHello>
     let params = req
         .parse_json::<ReqHello>()
         .await
-        .with_context(|| make_ctx("Failed to parse the request body as JSON"))?;
+        .with_context(|| wrap("Failed to parse the request body as JSON"))?;
 
     if let Err(e) = params.validate() {
         return Err(ApiErr::Params(e.to_string()));

@@ -53,7 +53,7 @@ impl Identity {
         };
         let key = secret.as_bytes();
 
-        let plain = match aes_decrypt_cbc(key, &key[..16], &cipher) {
+        let plain = match aes_decrypt_cbc(key, &key[..16], &cipher, None) {
             Err(e) => {
                 tracing::error!(err = ?e, "invalid auth_token");
                 return Identity::default();

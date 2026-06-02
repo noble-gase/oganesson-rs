@@ -4,7 +4,7 @@ pub mod db;
 pub mod logger;
 
 use anyhow::Context;
-use neon_rs::redis::pool::SinglePool;
+use neon_rs::redix::factory::SinglePool;
 use sqlx::MySqlPool;
 
 #[derive(Clone, Default)]

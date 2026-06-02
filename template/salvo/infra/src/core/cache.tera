@@ -1,6 +1,9 @@
 use std::time::Duration;
 
-use neon_rs::redis::client::{self, Params, Single, SinglePool};
+use neon_rs::redix::{
+    self, PoolParams,
+    factory::{Single, SinglePool},
+};
 
 use crate::core::config::config;
 
@@ -15,7 +18,7 @@ pub async fn new(cfg_key: &str) -> anyhow::Result<SinglePool> {
     let idle_timeout = cfg.get_int(&format!("{cfg_key}.options.idle_timeout")).unwrap_or(300);
     let max_lifetime = cfg.get_int(&format!("{cfg_key}.options.max_lifetime")).unwrap_or(600);
 
-    let params = Params {
+    let params = PoolParams {
         max_size: Some(max_size as u32),
         min_idle: Some(min_idle as u32),
         conn_timeout: Some(Duration::from_secs(conn_timeout as u64)),
@@ -23,7 +26,7 @@ pub async fn new(cfg_key: &str) -> anyhow::Result<SinglePool> {
         max_lifetime: Some(Duration::from_secs(max_lifetime as u64)),
     };
 
-    let pool = client::open::<Single>(vec![dsn], Some(params)).await?;
+    let pool = redix::open::<Single>(vec![dsn], Some(params)).await?;
 
     Ok(pool)
 }
