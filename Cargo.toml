@@ -16,5 +16,5 @@ path = "src/main.rs"
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }
-tera = "1"
+tera = "2"
 serde = { version = "1", features = ["derive"] }
