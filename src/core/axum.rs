@@ -65,7 +65,7 @@ pub fn infra() -> Tera {
         ("src/core/cache.rs", include_str!("../../template/axum/infra/src/core/cache.tera")),
         ("src/core/config.rs", include_str!("../../template/axum/infra/src/core/config.tera")),
         ("src/core/db.rs", include_str!("../../template/axum/infra/src/core/db.tera")),
-        ("src/core/logger.rs", include_str!("../../template/axum/infra/src/core/logger.tera")),
+        ("src/core/log.rs", include_str!("../../template/axum/infra/src/core/log.tera")),
         // extract
         ("src/extract/mod.rs", include_str!("../../template/axum/infra/src/extract/mod.tera")),
         ("src/extract/json.rs", include_str!("../../template/axum/infra/src/extract/json.tera")),

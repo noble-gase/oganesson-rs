@@ -65,7 +65,7 @@ pub fn infra() -> Tera {
         ("src/core/cache.rs", include_str!("../../template/actix/infra/src/core/cache.tera")),
         ("src/core/config.rs", include_str!("../../template/actix/infra/src/core/config.tera")),
         ("src/core/db.rs", include_str!("../../template/actix/infra/src/core/db.tera")),
-        ("src/core/logger.rs", include_str!("../../template/actix/infra/src/core/logger.tera")),
+        ("src/core/log.rs", include_str!("../../template/actix/infra/src/core/log.tera")),
         // middleware
         ("src/middleware/mod.rs", include_str!("../../template/actix/infra/src/middleware/mod.tera")),
         ("src/middleware/log.rs", include_str!("../../template/actix/infra/src/middleware/log.tera")),
