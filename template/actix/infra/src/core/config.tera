@@ -1,16 +1,16 @@
 use anyhow::Context;
 use config::Config;
-use std::{fs, sync::OnceLock};
+use std::{path::Path, sync::OnceLock};
 
 pub static CFG: OnceLock<Config> = OnceLock::new();
 
-pub fn init(cfg_file: &str) -> anyhow::Result<()> {
-    let path = fs::canonicalize(cfg_file).with_context(|| format!("Config({}) init failed", cfg_file))?;
+pub fn init(cfg_file: impl AsRef<Path>) -> anyhow::Result<()> {
+    let cfg_file = cfg_file.as_ref();
 
     let cfg = Config::builder()
-        .add_source(config::File::with_name(path.to_str().unwrap()))
+        .add_source(config::File::from(cfg_file))
         .build()
-        .with_context(|| format!("Config({}) init failed", cfg_file))?;
+        .with_context(|| format!("Config({}) init failed", cfg_file.display()))?;
 
     let _ = CFG.set(cfg);
 

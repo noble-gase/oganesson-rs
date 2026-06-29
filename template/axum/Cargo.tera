@@ -44,7 +44,7 @@ http-body-util = "0.1"
 tower-http = { version = "0.6", features = ["cors"] }
 axum = { version = "0.8", features = ["macros", "http2"] }
 axum-extra = "0.12"
-neon-rs = { version = "0.1", features = [
+neon-rs = { version = "0.2", features = [
     "crypto-aes",
     "macros",
     "redis",

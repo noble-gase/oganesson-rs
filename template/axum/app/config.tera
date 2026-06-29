@@ -10,11 +10,11 @@ options = { min_conns = 10, max_conns = 100, conn_timeout = 10, idle_timeout = 3
 
 [redis]
 dsn = "redis://127.0.0.1:6379/0"
-options = { max_size = 100, min_idle = 10, conn_timeout = 10, idle_timeout = 300, max_lifetime = 600 }
+options = { retry_count = 6, connect_timeout = 10, response_timeout = 10 }
 
 [redis-cluster]
 dsn = ["redis://127.0.0.1:6379/0"]
-options = { max_size = 100, min_idle = 10, conn_timeout = 10, idle_timeout = 300, max_lifetime = 600 }
+options = { retry_count = 6, connect_timeout = 10, response_timeout = 10 }
 
 [log]
 path = "logs"

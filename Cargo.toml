@@ -1,10 +1,10 @@
 [package]
 name = "oganesson-rs"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 authors = ["ShengHui <847713844@qq.com>"]
-description = "The Rust web development scaffold, support salvo and axum"
-keywords = ["web", "api", "actix-web", "salvo", "axum"]
+description = "The Rust web development scaffold, support actix-web, axum and salvo"
+keywords = ["web", "api", "actix-web", "axum", "salvo"]
 license = "MIT"
 repository = "https://github.com/noble-gase/oganesson-rs"
 

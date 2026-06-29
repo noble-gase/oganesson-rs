@@ -8,7 +8,7 @@ use std::{panic, sync::Arc, time::Duration};
 
 use clap::Parser;
 use figlet_rs::FIGlet;
-use infra::core::{AppState, config, logger};
+use infra::core::{AppState, config, log};
 use neon_rs::sql::set_sql_logger;
 
 #[tokio::main]
@@ -22,7 +22,7 @@ async fn main() -> anyhow::Result<()> {
     config::init(&cli.config)?;
 
     // _guard 必须在 main 函数中才能使日志生效
-    let _guard = logger::init();
+    let _guard = log::init();
 
     // catch panic
     panic::set_hook(Box::new(|e| {

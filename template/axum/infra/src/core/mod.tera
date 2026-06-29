@@ -1,16 +1,16 @@
 pub mod cache;
 pub mod config;
 pub mod db;
-pub mod logger;
+pub mod log;
 
 use anyhow::Context;
-use neon_rs::redix::factory::SinglePool;
+use neon_rs::redix::client::AsyncSingle;
 use sqlx::MySqlPool;
 
 #[derive(Clone, Default)]
 pub struct AppState {
     db_default: Option<MySqlPool>,
-    redis_default: Option<SinglePool>,
+    redis_default: Option<AsyncSingle>,
 }
 
 impl AppState {
@@ -29,7 +29,7 @@ impl AppState {
         self.db_default.as_ref().expect("DB(default) is None (forgotten initialize?)")
     }
 
-    pub fn redis(&self) -> &SinglePool {
+    pub fn redis(&self) -> &AsyncSingle {
         self.redis_default
             .as_ref()
             .expect("Redis(default) is None (forgotten initialize?)")
