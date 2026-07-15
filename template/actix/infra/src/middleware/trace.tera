@@ -1,16 +1,14 @@
 use std::sync::LazyLock;
 
 use actix_web::{
-    Error, HttpMessage,
+    Error,
     body::MessageBody,
     dev::{ServiceRequest, ServiceResponse},
-    http::header::{AUTHORIZATION, HeaderName, HeaderValue},
+    http::header::{HeaderName, HeaderValue},
     middleware::Next,
 };
 use tracing::Instrument;
 use uuid::Uuid;
-
-use crate::util::iden::Identity;
 
 pub const TRACE_ID: HeaderName = HeaderName::from_static("x-trace-id");
 
@@ -28,23 +26,8 @@ pub async fn trace_mw(mut req: ServiceRequest, next: Next<impl MessageBody>) -> 
         _ => gen_trace_id(&mut req),
     };
 
-    // 解析 Identity
-    let token = req
-        .headers()
-        .get(AUTHORIZATION)
-        .and_then(|v| v.to_str().ok())
-        .map(|s| s.to_string());
-    let iden = match token {
-        None => Identity::default(),
-        Some(v) => Identity::from_auth_token(v),
-    };
-    let iden_str = iden.to_string();
-
-    // 设置 Identity
-    req.extensions_mut().insert(iden);
-
     // 设置 trace span
-    let span = tracing::info_span!("trace", hostname = HOSTNAME.as_str(), trace_id, identity = iden_str);
+    let span = tracing::info_span!("trace", hostname = HOSTNAME.as_str(), trace_id);
     let mut resp = next.call(req).instrument(span).await?;
     // 设置 Header
     resp.headers_mut()

@@ -36,9 +36,6 @@ pub fn app() -> Tera {
         // handler
         ("src/handler/mod.rs", include_str!("../../template/salvo/app/src/handler/mod.tera")),
         ("src/handler/greeter.rs", include_str!("../../template/salvo/app/src/handler/greeter.tera")),
-        // middleware
-        ("src/middleware/mod.rs", include_str!("../../template/salvo/app/src/middleware/mod.tera")),
-        ("src/middleware/auth.rs", include_str!("../../template/salvo/app/src/middleware/auth.tera")),
         // router
         ("src/router/mod.rs", include_str!("../../template/salvo/app/src/router/mod.tera")),
         ("src/router/route.rs", include_str!("../../template/salvo/app/src/router/route.tera")),
@@ -76,9 +73,6 @@ pub fn infra() -> Tera {
         ("src/status/mod.rs", include_str!("../../template/salvo/infra/src/status/mod.tera")),
         ("src/status/api_ok.rs", include_str!("../../template/salvo/infra/src/status/api_ok.tera")),
         ("src/status/api_err.rs", include_str!("../../template/salvo/infra/src/status/api_err.tera")),
-        // util
-        ("src/util/mod.rs", include_str!("../../template/salvo/infra/src/util/mod.tera")),
-        ("src/util/iden.rs", include_str!("../../template/salvo/infra/src/util/iden.tera")),
     ])
     .unwrap();
 

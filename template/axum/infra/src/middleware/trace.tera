@@ -1,11 +1,9 @@
 use std::sync::LazyLock;
 
 use axum::{extract::Request, http::HeaderValue, middleware::Next, response::Response};
-use http::{HeaderName, header::AUTHORIZATION};
+use http::HeaderName;
 use tracing::Instrument;
 use uuid::Uuid;
-
-use crate::util::iden::Identity;
 
 pub const TRACE_ID: HeaderName = HeaderName::from_static("x-trace-id");
 
@@ -24,19 +22,8 @@ pub async fn trace_mw(mut req: Request, next: Next) -> Response {
         None => gen_trace_id(&mut req),
     };
 
-    // 解析 Identity
-    let token = req.headers().get(AUTHORIZATION).and_then(|v| v.to_str().ok());
-    let id = match token {
-        None => Identity::default(),
-        Some(v) => Identity::from_auth_token(v.to_string()),
-    };
-    let id_str = id.to_string();
-
-    // 设置 Identity
-    req.extensions_mut().insert(id);
-
     // 设置 trace span
-    let span = tracing::info_span!("trace", hostname = HOSTNAME.as_str(), trace_id, identity = id_str);
+    let span = tracing::info_span!("trace", hostname = HOSTNAME.as_str(), trace_id);
     let mut resp = next.run(req).instrument(span).await;
     // 设置 Header
     resp.headers_mut()

@@ -1,11 +1,9 @@
 use std::sync::LazyLock;
 
-use http::{HeaderName, HeaderValue, header::AUTHORIZATION};
+use http::{HeaderName, HeaderValue};
 use salvo::{Depot, FlowCtrl, Handler, Request, Response, async_trait};
 use tracing::Instrument;
 use uuid::Uuid;
-
-use crate::util::iden::Identity;
 
 pub const TRACE_ID: HeaderName = HeaderName::from_static("x-trace-id");
 
@@ -36,20 +34,8 @@ impl Handler for Trace {
             None => gen_trace_id(req),
         };
 
-        // 解析 Identity
-        let token = req.header::<String>(AUTHORIZATION);
-        let iden = match token {
-            None => Identity::default(),
-            Some(v) => Identity::from_auth_token(v),
-        };
-        let iden_str = iden.to_string();
-
-        // 设置 Identity
-        depot.insert("trace_id", trace_id.clone());
-        depot.inject(iden);
-
         // 设置 trace span
-        let span = tracing::info_span!("trace", hostname = HOSTNAME.as_str(), trace_id, identity = iden_str);
+        let span = tracing::info_span!("trace", hostname = HOSTNAME.as_str(), trace_id);
         ctrl.call_next(req, depot, resp).instrument(span).await;
         // 设置 Header
         resp.headers_mut()

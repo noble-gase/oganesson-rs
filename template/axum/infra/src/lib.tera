@@ -2,4 +2,3 @@ pub mod core;
 pub mod extract;
 pub mod middleware;
 pub mod status;
-pub mod util;
