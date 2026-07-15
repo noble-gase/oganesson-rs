@@ -35,8 +35,8 @@ pub fn run(name: Option<String>, kind: Kind, apps: Vec<String>) {
     // 创建项目
     match kind {
         Kind::Axum => core::build_axum_project(&root, name, apps),
+        Kind::Actix => core::build_actix_project(&root, name, apps),
         Kind::Salvo => core::build_salvo_project(&root, name, apps),
-        _ => core::build_actix_project(&root, name, apps),
     }
 
     println!("🦀 Project creation completed! please read README")

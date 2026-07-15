@@ -5,8 +5,8 @@ use clap::{Parser, Subcommand};
 
 pub enum Kind {
     Axum,
-    Salvo,
     Actix,
+    Salvo,
 }
 
 #[derive(Parser)]
@@ -18,27 +18,13 @@ pub struct Cli {
 
 #[derive(Subcommand, Debug, Clone)]
 pub enum Command {
+    Init,
     New {
         #[arg(short, long)]
-        name: Option<String>,
-
-        #[arg(short, long)]
-        axum: bool,
-
-        #[arg(short, long)]
-        salvo: bool,
-
-        #[arg(short, long)]
-        app: Vec<String>,
+        name: String,
     },
     App {
         #[arg(short, long)]
         name: Vec<String>,
-
-        #[arg(short, long)]
-        axum: bool,
-
-        #[arg(short, long)]
-        salvo: bool,
     },
 }

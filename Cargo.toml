@@ -1,6 +1,6 @@
 [package]
 name = "oganesson-rs"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 authors = ["ShengHui <847713844@qq.com>"]
 description = "The Rust web development scaffold, support actix-web, axum and salvo"
@@ -16,5 +16,6 @@ path = "src/main.rs"
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }
+inquire = "0.9"
 tera = "2"
 serde = { version = "1", features = ["derive"] }

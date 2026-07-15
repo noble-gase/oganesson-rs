@@ -1,4 +1,4 @@
-# ogx
+# og (salvo)
 
 基于 [salvo](https://github.com/salvo-rs/salvo) 的 Rust API 快速开发脚手架
 
@@ -21,7 +21,7 @@
 
 #### 2. 本地运行
 
-> 进入app目录
+> 进入 `app` 目录
 
 ```shell
 # 配置文件

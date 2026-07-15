@@ -26,21 +26,12 @@ cargo install oganesson-rs
 
 ## 创建项目
 
-### 单应用
+<details>
+<summary>点击展开</summary>
 
 ```shell
-# actix-web
-og new # 在当前目录初始化项目
+og init # 在当前目录初始化项目
 og new --name demo # 创建demo项目
-
-# axum
-og new --axum # 在当前目录初始化项目
-og new --name demo --axum # 创建demo项目
-
-# salvo
-og new --salvo # 在当前目录初始化项目
-og new --name demo --salvo # 创建demo项目
-
 .
 ├── Cargo.toml
 ├── Dockerfile
@@ -71,72 +62,17 @@ og new --name demo --salvo # 创建demo项目
 
 ```
 
-### 多应用
-
-```shell
-# actix-web
-og new --app foo --app bar # 在当前目录初始化项目
-og new --name demo --app foo --app bar # 创建demo项目
-
-# axum
-og new --app foo --app bar --axum # 在当前目录初始化项目
-og new --name demo --app foo --app bar --axum # 创建demo项目
-
-# salvo
-og new --app foo --app bar --salvo # 在当前目录初始化项目
-og new --name demo --app foo --app bar --salvo # 创建demo项目
-
-.
-├── Cargo.toml
-├── Dockerfile.foo
-├── Dockerfile.bar
-├── app/
-│   ├── foo/
-│   │   ├── Cargo.toml
-│   │   ├── config.toml
-│   │   └── src/
-│   │       ├── cmd/
-│   │       ├── handler/
-│   │       ├── middleware/
-│   │       ├── router/
-│   │       ├── service/
-│   │       └── main.rs
-│   └── bar/
-│       ├── Cargo.toml
-│       ├── config.toml
-│       └── src/
-│           ├── ...
-│           └── main.rs
-├── infra/
-│   ├── Cargo.toml
-│   └── src/
-│       ├── core/
-│       ├── middleware/
-│       ├── status/
-│       ├── util/
-│       └── lib.rs
-└── repo/
-    ├── Cargo.toml
-    └── src/
-        ├── dao/
-        ├── schema/
-        └── lib.rs
-```
+</details>
 
 ## 创建应用
+
+<details>
+<summary>点击展开</summary>
 
 > 多应用项目适用，需在项目根目录执行（即：`Cargo.toml` 所在目录）
 
 ```shell
-# actix-web
 og app --name foo --name bar
-
-# axum
-og app --name foo --name bar --axum
-
-# salvo
-og app --name foo --name --salvo bar
-
 .
 ├── Cargo.toml
 ├── Dockerfile.foo
@@ -169,5 +105,7 @@ og app --name foo --name --salvo bar
         ├── ...
         └── lib.rs
 ```
+
+</details>
 
 **Enjoy 😊**

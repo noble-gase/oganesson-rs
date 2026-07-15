@@ -3,7 +3,7 @@ resolver = "3"
 members = {{ members }}
 
 [workspace.package]
-description = "Rust api build with ogx"
+description = "Rust api build with og"
 version = "0.0.1"
 edition = "2024"
 authors = ["ShengHui <847713844@qq.com>"]
