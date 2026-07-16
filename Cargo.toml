@@ -1,6 +1,6 @@
 [package]
 name = "oganesson-rs"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2024"
 authors = ["ShengHui <847713844@qq.com>"]
 description = "The Rust web development scaffold, support actix-web, axum and salvo"

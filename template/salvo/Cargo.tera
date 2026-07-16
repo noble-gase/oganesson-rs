@@ -48,9 +48,4 @@ salvo = { version = "0.75", features = [
     "http2-cleartext",
     "affix-state",
 ] }
-neon-rs = { version = "0.2", features = [
-    "crypto-aes",
-    "macros",
-    "redis",
-    "sql-mysql",
-] }
+neon-rs = { version = "0.2", features = ["macros", "redis", "sql-mysql"] }

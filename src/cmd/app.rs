@@ -10,12 +10,12 @@ pub fn run(apps: Vec<String>, kind: Kind) {
     }
 
     // 获取当前目录
-    let dir = env::current_dir().unwrap().canonicalize().unwrap();
+    let dir = env::current_dir().unwrap();
 
     match kind {
         Kind::Axum => core::build_axum_app(&dir, apps),
+        Kind::Actix => core::build_actix_app(&dir, apps),
         Kind::Salvo => core::build_salvo_app(&dir, apps),
-        _ => core::build_actix_app(&dir, apps),
     }
 
     println!("🦀 The app is now created!");

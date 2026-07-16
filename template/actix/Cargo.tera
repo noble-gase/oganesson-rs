@@ -39,9 +39,4 @@ prometheus = { version = "0.14", features = ["process"] }
 validator = { version = "0.20", features = ["derive"] }
 actix-web = "4"
 actix-cors = "0.7"
-neon-rs = { version = "0.2", features = [
-    "crypto-aes",
-    "macros",
-    "redis",
-    "sql-mysql",
-] }
+neon-rs = { version = "0.2", features = ["macros", "redis", "sql-mysql"] }

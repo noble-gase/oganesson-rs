@@ -7,7 +7,7 @@ use crate::{
 
 pub fn run(name: Option<String>, kind: Kind, apps: Vec<String>) {
     // 获取当前目录
-    let cur_dir = env::current_dir().unwrap().canonicalize().unwrap();
+    let cur_dir = env::current_dir().unwrap();
 
     let (root, name) = match name {
         Some(v) => {
