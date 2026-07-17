@@ -1,28 +1,68 @@
 use std::time::Duration;
 
 use neon_rs::redix::{self, ConnOptions, client::AsyncSingle, factory::Single};
+use serde::Deserialize;
 
 use crate::core::config::config;
 
-pub async fn new(cfg_key: &str) -> anyhow::Result<AsyncSingle> {
-    let cfg = config();
-
-    let dsn = cfg.get_string(&format!("{cfg_key}.dsn"))?;
-
-    let retry_count = cfg.get_int(&format!("{cfg_key}.options.retry_count")).unwrap_or(6);
-    let connect_timeout = cfg.get_int(&format!("{cfg_key}.options.connect_timeout")).unwrap_or(10);
-    let response_timeout = cfg.get_int(&format!("{cfg_key}.options.response_timeout")).unwrap_or(10);
-
-    let options = ConnOptions {
-        min_delay: None,
-        max_delay: None,
-        exponent_base: None,
-        retry_count: Some(retry_count as usize),
-        connect_timeout: Some(Duration::from_secs(connect_timeout as u64)),
-        response_timeout: Some(Duration::from_secs(response_timeout as u64)),
-    };
-
-    let pool = redix::open::<Single>(dsn, Some(options)).await?;
-
-    Ok(pool)
+#[derive(Debug, Deserialize)]
+#[serde(default)]
+struct RedisOptions {
+    retry_count: usize,
+    connect_timeout: u64,
+    response_timeout: u64,
 }
+
+impl Default for RedisOptions {
+    fn default() -> Self {
+        Self {
+            retry_count: 6,
+            connect_timeout: 10,
+            response_timeout: 10,
+        }
+    }
+}
+
+impl From<RedisOptions> for ConnOptions {
+    fn from(value: RedisOptions) -> Self {
+        Self {
+            min_delay: None,
+            max_delay: None,
+            exponent_base: None,
+            retry_count: Some(value.retry_count),
+            connect_timeout: Some(Duration::from_secs(value.connect_timeout)),
+            response_timeout: Some(Duration::from_secs(value.response_timeout)),
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct RedisConfig {
+    dsn: String,
+
+    #[serde(default)]
+    options: RedisOptions,
+}
+
+pub async fn new(cfg_key: &str) -> anyhow::Result<AsyncSingle> {
+    let cfg: RedisConfig = config().get(cfg_key)?;
+    let client = redix::open::<Single>(cfg.dsn, Some(cfg.options.into())).await?;
+
+    Ok(client)
+}
+
+// #[derive(Debug, Deserialize)]
+// struct ClusterConfig {
+//     dsn: Vec<String>,
+
+//     #[serde(default)]
+//     options: RedisOptions,
+// }
+
+// /// need enable feature "redis-cluster" in neon-rs
+// pub async fn new_cluster(cfg_key: &str) -> anyhow::Result<AsyncCluster> {
+//     let cfg: ClusterConfig = config().get(cfg_key)?;
+//     let client = redix::open::<Cluster>(cfg.dsn, Some(cfg.options.into())).await?;
+
+//     Ok(client)
+// }

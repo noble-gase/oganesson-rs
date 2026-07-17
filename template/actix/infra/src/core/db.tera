@@ -1,30 +1,56 @@
 use std::time::Duration;
 
 use neon_rs::sql::{self, SqlOptions, factory::MySQL};
+use serde::Deserialize;
 use sqlx::{MySql, Pool};
 
 use crate::core::config::config;
 
+#[derive(Debug, Deserialize)]
+#[serde(default)]
+struct DBOptions {
+    min_conns: u32,
+    max_conns: u32,
+    conn_timeout: u64,
+    idle_timeout: u64,
+    max_lifetime: u64,
+}
+
+impl Default for DBOptions {
+    fn default() -> Self {
+        Self {
+            min_conns: 10,
+            max_conns: 20,
+            conn_timeout: 10,
+            idle_timeout: 300,
+            max_lifetime: 600,
+        }
+    }
+}
+
+impl From<DBOptions> for SqlOptions {
+    fn from(value: DBOptions) -> Self {
+        Self {
+            min_conns: Some(value.min_conns),
+            max_conns: Some(value.max_conns),
+            conn_timeout: Some(Duration::from_secs(value.conn_timeout)),
+            idle_timeout: Some(Duration::from_secs(value.idle_timeout)),
+            max_lifetime: Some(Duration::from_secs(value.max_lifetime)),
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct DBConfig {
+    dsn: String,
+
+    #[serde(default)]
+    options: DBOptions,
+}
+
 pub async fn new(cfg_key: &str) -> anyhow::Result<Pool<MySql>> {
-    let cfg = config();
-
-    let dsn = cfg.get_string(&format!("{cfg_key}.dsn"))?;
-
-    let min_conns = cfg.get_int(&format!("{cfg_key}.options.min_conns")).unwrap_or(10);
-    let max_conns = cfg.get_int(&format!("{cfg_key}.options.max_conns")).unwrap_or(20);
-    let conn_timeout = cfg.get_int(&format!("{cfg_key}.options.conn_timeout")).unwrap_or(10);
-    let idle_timeout = cfg.get_int(&format!("{cfg_key}.options.idle_timeout")).unwrap_or(300);
-    let max_lifetime = cfg.get_int(&format!("{cfg_key}.options.max_lifetime")).unwrap_or(600);
-
-    let options = SqlOptions {
-        min_conns: Some(min_conns as u32),
-        max_conns: Some(max_conns as u32),
-        conn_timeout: Some(Duration::from_secs(conn_timeout as u64)),
-        idle_timeout: Some(Duration::from_secs(idle_timeout as u64)),
-        max_lifetime: Some(Duration::from_secs(max_lifetime as u64)),
-    };
-
-    let pool = sql::open::<MySQL>(dsn, Some(options)).await?;
+    let cfg: DBConfig = config().get(cfg_key)?;
+    let pool = sql::open::<MySQL>(cfg.dsn, Some(cfg.options.into())).await?;
 
     Ok(pool)
 }

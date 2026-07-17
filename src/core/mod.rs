@@ -113,7 +113,12 @@ pub fn build_salvo_app(root: &Path, apps: Vec<String>) {
 
 // --------------------------- project & app ---------------------------
 
-fn build_project(root: &Path, name: &str, members: &str, libs: (tera::Tera, tera::Tera, tera::Tera)) {
+fn build_project(
+    root: &Path,
+    name: &str,
+    members: &str,
+    libs: (tera::Tera, tera::Tera, tera::Tera),
+) {
     let mut ctx = Context::new();
     ctx.insert("name", name);
     ctx.insert("members", members);
@@ -192,7 +197,14 @@ pub fn gen_members(apps: &[String], base: Option<Vec<String>>) -> String {
         members.push("app/*".to_string())
     }
 
-    format!("[{}]", members.iter().map(|m| format!("\"{}\"", m)).collect::<Vec<_>>().join(", "))
+    format!(
+        "[{}]",
+        members
+            .iter()
+            .map(|m| format!("\"{}\"", m))
+            .collect::<Vec<_>>()
+            .join(", ")
+    )
 }
 
 fn gen_files(ctx: &Context, root: &Path, subset: Vec<&str>, template: tera::Tera) {
@@ -212,7 +224,9 @@ fn gen_files(ctx: &Context, root: &Path, subset: Vec<&str>, template: tera::Tera
     }
 
     let prefix = &subset.join("/");
-    let dir = subset.into_iter().fold(root.to_path_buf(), |acc, part| acc.join(part));
+    let dir = subset
+        .into_iter()
+        .fold(root.to_path_buf(), |acc, part| acc.join(part));
 
     if !is_empty_dir(&dir) {
         println!("👿 The directory({dir:?}) is not empty, please confirm!");

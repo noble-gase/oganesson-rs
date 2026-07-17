@@ -31,7 +31,9 @@ fn main() {
 }
 
 fn project_form() -> (Kind, Vec<String>) {
-    let framework = Select::new("Framework:", vec!["axum", "actix", "salvo"]).prompt().unwrap();
+    let framework = Select::new("Framework:", vec!["axum", "actix", "salvo"])
+        .prompt()
+        .unwrap();
     let kind = match framework {
         "axum" => Kind::Axum,
         "actix" => Kind::Actix,
@@ -54,7 +56,9 @@ fn project_form() -> (Kind, Vec<String>) {
 }
 
 fn app_form() -> Kind {
-    let framework = Select::new("Framework:", vec!["axum", "actix", "salvo"]).prompt().unwrap();
+    let framework = Select::new("Framework:", vec!["axum", "actix", "salvo"])
+        .prompt()
+        .unwrap();
 
     match framework {
         "axum" => Kind::Axum,
